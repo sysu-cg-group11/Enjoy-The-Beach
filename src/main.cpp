@@ -36,6 +36,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+float eyeValue[3] = { 5.0, 5.0, 10.0 },lightValue[3] = { 0.0, 5.0, 0.0 };
+
 int main()
 {
 	// glfw: initialize and configure
@@ -88,6 +90,13 @@ int main()
 	Shader shader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
 	Shader model_shader("../src/shaders/model_shader.vs", "../src/shaders/model_shader.fs");
 
+	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
 	// build and compile our shader program
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// skybox VAO
@@ -111,11 +120,12 @@ int main()
 	};
 
 	unsigned int cubemapTexture = loadCubemap(faces);
-	shader.use();
-	shader.setInt("skybox", 0);
+	shader.Use();
+	shader.SetInteger("skybox", 0);
 
 	// Load the models
-	Model beach("../resources/archive/Octopus.obj");
+	Model beach;
+	beach.LoadModel("../resources/beach/model.obj");
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	// render loop
@@ -144,24 +154,29 @@ int main()
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-		shader.use();
+		shader.Use();
 
-		shader.setMat4("view", view);
-		shader.setMat4("projection", projection);
+		shader.SetMatrix4("view", view);
+		shader.SetMatrix4("projection", projection);
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(5.0f, 5.0f, 5.0f));
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 
-		model_shader.use();
+		model_shader.Use();
 
-		model_shader.setMat4("model", model);
-		model_shader.setMat4("view", view);
-		model_shader.setMat4("projection", projection);
+		model_shader.SetMatrix4("model", model);
+		model_shader.SetMatrix4("view", view);
+		model_shader.SetMatrix4("projection", projection);
 
-		beach.Draw(model_shader);
 
-		shader.use();
+		model_shader.SetVector3f("viewPos", camera.Position);
+		model_shader.SetVector3f("lightColor", glm::vec3(1, 1, 1));
+		model_shader.SetVector3f("lightPos", glm::vec3(lightValue[0], lightValue[1], lightValue[2]));
+
+		beach.Draw(&model_shader);
+
+		shader.Use();
 		// skybox cube
 		glBindVertexArray(skyboxVAO);
 		glActiveTexture(GL_TEXTURE0);
@@ -252,10 +267,10 @@ unsigned int loadTexture(char const * path)
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		stbi_image_free(data);
 	}
