@@ -1,4 +1,5 @@
 #include "shader.h"
+
 Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
 	string vertexCode, fragmentCode;
 	ifstream vertexFile, fragmentFile;

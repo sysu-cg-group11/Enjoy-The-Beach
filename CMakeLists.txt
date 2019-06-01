@@ -6,7 +6,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 
-FILE(GLOB_RECURSE SOURCE ${SOURCE_DIR}/*.cpp ${SOURCE_DIR}/*.c)
+FILE(GLOB_RECURSE SOURCE ${SOURCE_DIR}/*.cpp ${SOURCE_DIR}/*.c ${SOURCE_DIR}/utils/*.cpp)
 FILE(GLOB_RECURSE HEADER ${SOURCE_DIR}/*.h ${SOURCE_DIR}/*.hpp)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -41,6 +41,7 @@ endif(UNIX AND NOT APPLE)
 
 if (WIN32)
     set(os windows)
+    add_compile_definitions(_GLFW_WIN32)
     if (MSVC)
         add_compile_definitions(NDEBUG)
     endif(MSVC)
@@ -68,3 +69,6 @@ target_link_libraries(${EXECUTABLE_NAME} imgui)
 target_link_libraries(${EXECUTABLE_NAME} glad)
 target_link_libraries(${EXECUTABLE_NAME} glm)
 add_dependencies(${EXECUTABLE_NAME} copy-resources)
+
+# Add include dirs
+include_directories(${CMAKE_SOURCE_DIR}/includes)

@@ -9,4 +9,5 @@
 !/dependencies/**
 !*.pptx
 !CMakeLists.txt
-
+!includes
+!/includes/**
