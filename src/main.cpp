@@ -8,11 +8,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <thread>
-#include "shader.h"
-#include "data.h"
-#include "camera.h"
+#include "utils/shader.h"
+#include "utils/data.h"
+#include "utils/camera.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -20,7 +19,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 unsigned int loadTexture(const char *path);
-unsigned int loadCubemap(vector<std::string> faces);
+unsigned int loadCubemap(std::vector<std::string> faces);
 
 // settings
 const unsigned int SCR_WIDTH = 1024;
@@ -100,7 +99,7 @@ int main()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-	vector<std::string> faces
+	std::vector<std::string> faces
 	{
 		"../resources/textures/cartoon/2/2.jpg",
 		"../resources/textures/cartoon/2/0.jpg",
@@ -253,7 +252,7 @@ unsigned int loadTexture(char const * path)
 	return textureID;
 }
 
-unsigned int loadCubemap(vector<std::string> faces)
+unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
