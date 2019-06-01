@@ -30,6 +30,7 @@ add_subdirectory(dependencies/assimp)
 include_directories(dependencies/GLFW/include)
 include_directories(dependencies/include)
 include_directories(dependencies/assimp/include)
+
 FILE(GLOB DEPENDENCIES_SOURCE dependencies/src/*.c dependencies/src/*.cpp)
 FILE(GLOB ALL_SOURCES ${SOURCE} ${HEADER} ${DEPENDENCIES_SOURCE})
 
@@ -73,5 +74,6 @@ target_link_libraries(${EXECUTABLE_NAME} glfw)
 target_link_libraries(${EXECUTABLE_NAME} imgui)
 target_link_libraries(${EXECUTABLE_NAME} glad)
 target_link_libraries(${EXECUTABLE_NAME} glm)
+target_link_libraries(${EXECUTABLE_NAME} assimp)
 add_dependencies(${EXECUTABLE_NAME} copy-resources)
 
