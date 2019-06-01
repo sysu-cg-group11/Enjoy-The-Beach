@@ -87,7 +87,7 @@ int main()
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
-	Shader shader("shaders/shader.vs", "shaders/shader.fs");
+	Shader shader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
 
 	// build and compile our shader program
 	// set up vertex data (and buffer(s)) and configure vertex attributes
@@ -103,12 +103,12 @@ int main()
 
 	vector<std::string> faces
 	{
-		"resources/textures/CloudyCrown_01_Midday/CloudyCrown_Midday_Right.png",
-		"resources/textures/CloudyCrown_01_Midday/CloudyCrown_Midday_Left.png",
-		"resources/textures/CloudyCrown_01_Midday/CloudyCrown_Midday_Up.png",
-		"resources/textures/CloudyCrown_01_Midday/CloudyCrown_Midday_Down.png",
-		"resources/textures/CloudyCrown_01_Midday/CloudyCrown_Midday_Front.png",
-		"resources/textures/CloudyCrown_01_Midday/CloudyCrown_Midday_Back.png"
+		"../resources/textures/skybox/right.jpg",
+		"../resources/textures/skybox/left.jpg",
+		"../resources/textures/skybox/top.jpg",
+		"../resources/textures/skybox/bottom.jpg",
+		"../resources/textures/skybox/front.jpg",
+		"../resources/textures/skybox/back.jpg"
 	};
 
 	unsigned int cubemapTexture = loadCubemap(faces);
