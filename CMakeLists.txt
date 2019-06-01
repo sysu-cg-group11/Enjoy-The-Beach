@@ -78,3 +78,5 @@ target_link_libraries(${EXECUTABLE_NAME} glm)
 target_link_libraries(${EXECUTABLE_NAME} assimp)
 add_dependencies(${EXECUTABLE_NAME} copy-resources)
 
+
+include_directories(src/includes)

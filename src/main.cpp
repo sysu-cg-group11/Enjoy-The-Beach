@@ -8,11 +8,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <thread>
-#include "utils/shader.h"
-#include "utils/data.h"
-#include "utils/camera.h"
 
-#include "stb_image.h"
+#include <shader.h>
+#include <data.h>
+#include <camera.h>
+#include <model.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -86,6 +86,7 @@ int main()
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
 	Shader shader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
+	Shader model_shader("../src/shaders/model_shader.vs", "../src/shaders/model_shader.fs");
 
 	// build and compile our shader program
 	// set up vertex data (and buffer(s)) and configure vertex attributes
@@ -113,6 +114,9 @@ int main()
 	shader.use();
 	shader.setInt("skybox", 0);
 
+	// Load the models
+	Model beach("../resources/beach/model.obj");
+
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -136,16 +140,28 @@ int main()
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 
-		glm::mat4 model = glm::mat4(1.0f);
+
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 		shader.use();
 
-		//view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-		shader.setMat4("model", model);
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+
+		model_shader.use();
+
+		model_shader.setMat4("model", model);
+		model_shader.setMat4("view", view);
+		model_shader.setMat4("projection", projection);
+
+		beach.Draw(model_shader);
+
+		shader.use();
 		// skybox cube
 		glBindVertexArray(skyboxVAO);
 		glActiveTexture(GL_TEXTURE0);
