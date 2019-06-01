@@ -9,6 +9,8 @@ set(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 FILE(GLOB_RECURSE SOURCE ${SOURCE_DIR}/*.cpp ${SOURCE_DIR}/*.c ${SOURCE_DIR}/utils/*.cpp)
 FILE(GLOB_RECURSE HEADER ${SOURCE_DIR}/*.h ${SOURCE_DIR}/*.hpp)
 
+include_directories(src/includes)
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -28,12 +30,15 @@ add_subdirectory(dependencies/glad)
 add_subdirectory(dependencies/GLM)
 add_subdirectory(dependencies/GLFW)
 add_subdirectory(dependencies/assimp)
+add_subdirectory(dependencies/freetype)
 include_directories(dependencies/GLFW/include)
 include_directories(dependencies/include)
 include_directories(dependencies/assimp/include)
+include_directories(dependencies/freetype/include)
 
 FILE(GLOB DEPENDENCIES_SOURCE dependencies/src/*.c dependencies/src/*.cpp)
 FILE(GLOB ALL_SOURCES ${SOURCE} ${HEADER} ${DEPENDENCIES_SOURCE})
+
 
 add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
 
@@ -76,7 +81,5 @@ target_link_libraries(${EXECUTABLE_NAME} imgui)
 target_link_libraries(${EXECUTABLE_NAME} glad)
 target_link_libraries(${EXECUTABLE_NAME} glm)
 target_link_libraries(${EXECUTABLE_NAME} assimp)
+target_link_libraries(${EXECUTABLE_NAME} freetype)
 add_dependencies(${EXECUTABLE_NAME} copy-resources)
-
-
-include_directories(src/includes)
