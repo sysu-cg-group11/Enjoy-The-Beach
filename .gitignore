@@ -1,6 +1,12 @@
-/build/
-/bin/
+/*
+!.gitignore
+!src
+!/src/**
+!resources
+!/resources/**
+!README.md
+!dependencies
+!/dependencies/**
+!*.pptx
+!CMakeLists.txt
 
-
-.exe
-.pdf
