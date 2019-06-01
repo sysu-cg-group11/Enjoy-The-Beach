@@ -1,0 +1,3 @@
+[submodule "dependencies"]
+	path = dependencies
+	url = https://github.com/sysu-cg-group11/etb-dependencies.git
