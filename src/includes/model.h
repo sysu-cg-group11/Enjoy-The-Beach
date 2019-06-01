@@ -146,7 +146,6 @@ private:
 				indices.push_back(face.mIndices[j]);
 		}
 
-		cout << mesh->mMaterialIndex << endl;
 		if (mesh->mMaterialIndex >= 0) {
 			// process materials
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
@@ -177,7 +176,6 @@ private:
 		vector<Texture> textures;
 		aiColor3D color(1.0f, 1.0f, 1.0f);
 		mat->Get(pKey, type, idx, color);
-		cout << color.r << ' ' << color.g << ' ' << color.b << endl;
 		Texture texture;
 		texture.id = -1;
 		texture.type = typeName;

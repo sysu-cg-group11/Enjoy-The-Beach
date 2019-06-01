@@ -13,21 +13,23 @@
 #include <data.h>
 #include <camera.h>
 #include <model.h>
+#include <font_render.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+
 unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(std::vector<std::string> faces);
 
 // settings
-const unsigned int SCR_WIDTH = 1024;
-const unsigned int SCR_HEIGHT = 768;
+const unsigned int SCR_WIDTH = 1580;
+const unsigned int SCR_HEIGHT = 850;
 const char *glsl_version = "#version 330";
 
 //camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 3.0f, 10.0f));
 float lastX = (float)SCR_WIDTH / 2.0;
 float lastY = (float)SCR_HEIGHT / 2.0;
 bool firstMouse = true;
@@ -37,6 +39,8 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 float eyeValue[3] = { 5.0, 5.0, 10.0 },lightValue[3] = { 0.0, 5.0, 0.0 };
+
+glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
 
 int main()
 {
@@ -89,6 +93,12 @@ int main()
 
 	Shader shader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
 	Shader model_shader("../src/shaders/model_shader.vs", "../src/shaders/model_shader.fs");
+	Shader font_shader("../src/shaders/font_shader.vs", "../src/shaders/font_shader.fs");
+
+	// Set font infos
+	font_shader.SetMatrix4("projection", glm::ortho(0.0f, (float)SCR_WIDTH, 0.0f, (float)SCR_HEIGHT), true);
+	// Create font renderer
+	FontRender render(&font_shader, "../resources/Font/TimesNewRoman.ttf");
 
 	glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -160,8 +170,8 @@ int main()
 		shader.SetMatrix4("projection", projection);
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(5.0f, 5.0f, 5.0f));
-		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+		model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		model_shader.Use();
 
@@ -184,6 +194,9 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
+
+		render.RenderText("Enjoy-The-Beach", header,
+			1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		// render
 		ImGui::Render();
