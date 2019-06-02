@@ -15,6 +15,9 @@
 #include <model.h>
 #include <font_render.h>
 
+#include <terrain/Config.h>
+#include <terrain/Simulation.h>
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -46,6 +49,7 @@ float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { 0.0, 30.0, 0.0 };
 // Head themes location
 glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
 
+Simulation simulation;
 
 int main()
 {
@@ -147,11 +151,13 @@ int main()
 	// Character birds
 	Model bird("../resources/birds/bird2/NOVELO_PARROT.obj");
 	
+	simulation.init(window);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
+		/*
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -215,6 +221,9 @@ int main()
 		// render
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		*/
+
+		simulation.display();
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		glfwSwapBuffers(window);
