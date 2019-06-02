@@ -20,6 +20,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
+void drawModel(Shader& model_shader, Model& model, glm::vec3 position, glm::vec3 size = glm::vec3(1.0f), glm::vec3 rotate = glm::vec3(0.0f));
+
 unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(std::vector<std::string> faces);
 
@@ -29,7 +31,7 @@ const unsigned int SCR_HEIGHT = 850;
 const char *glsl_version = "#version 330";
 
 //camera
-Camera camera(glm::vec3(0.0f, 3.0f, 10.0f));
+Camera camera(glm::vec3(0.0f, 10.0f, 10.0f));
 float lastX = (float)SCR_WIDTH / 2.0;
 float lastY = (float)SCR_HEIGHT / 2.0;
 bool firstMouse = true;
@@ -38,9 +40,12 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-float eyeValue[3] = { 5.0, 5.0, 10.0 },lightValue[3] = { 0.0, 5.0, 0.0 };
+// View position and light position
+float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { 0.0, 30.0, 0.0 };
 
+// Head themes location
 glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
+
 
 int main()
 {
@@ -91,6 +96,7 @@ int main()
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
+	// Init shaders
 	Shader shader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
 	Shader model_shader("../src/shaders/model_shader.vs", "../src/shaders/model_shader.fs");
 	Shader font_shader("../src/shaders/font_shader.vs", "../src/shaders/font_shader.fs");
@@ -121,21 +127,26 @@ int main()
 
 	std::vector<std::string> faces
 	{
-		"../resources/textures/cartoon/2/2.jpg",
-		"../resources/textures/cartoon/2/0.jpg",
-		"../resources/textures/cartoon/2/4.jpg",
-		"../resources/textures/cartoon/2/5.jpg",
-		"../resources/textures/cartoon/2/1.jpg",
-		"../resources/textures/cartoon/2/3.jpg"
+		"../resources/textures/skybox1/right.jpg",
+		"../resources/textures/skybox1/left.jpg",
+		"../resources/textures/skybox1/top.jpg",
+		"../resources/textures/skybox1/bottom.jpg",
+		"../resources/textures/skybox1/back.jpg",
+		"../resources/textures/skybox1/front.jpg"
 	};
 
 	unsigned int cubemapTexture = loadCubemap(faces);
 	shader.Use();
 	shader.SetInteger("skybox", 0);
 
-	// Load the models
-	Model beach;
-	beach.LoadModel("../resources/beach/model.obj");
+	// Load all .obj models
+	Model mainBeach("../resources/beach/Beach.obj");
+	Model smallBeach("../resources/beach/model.obj");
+	Model seagull("../resources/seagull/Flying gull Texture 2.obj");
+	Model wave("../resources/water/Wave.obj");
+	// Character birds
+	Model bird("../resources/birds/bird2/NOVELO_PARROT.obj");
+	
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	// render loop
@@ -169,22 +180,25 @@ int main()
 		shader.SetMatrix4("view", view);
 		shader.SetMatrix4("projection", projection);
 
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-
+		// Draw all imported models
 		model_shader.Use();
 
-		model_shader.SetMatrix4("model", model);
 		model_shader.SetMatrix4("view", view);
 		model_shader.SetMatrix4("projection", projection);
-
-
 		model_shader.SetVector3f("viewPos", camera.Position);
 		model_shader.SetVector3f("lightColor", glm::vec3(1, 1, 1));
 		model_shader.SetVector3f("lightPos", glm::vec3(lightValue[0], lightValue[1], lightValue[2]));
 
-		beach.Draw(&model_shader);
+		// Draw Models
+		drawModel(model_shader, mainBeach, glm::vec3(35.0f, 5.0f, 20.0f), glm::vec3(0.000011f, 0.00002f, 0.00002f));
+		drawModel(model_shader, smallBeach, glm::vec3(5.0f, 7.8f, 5.0f), glm::vec3(8.0f, 8.0f, 8.0f));
+		drawModel(model_shader, wave, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.00011f, 0.00004f, 0.00011f));
+		// Add seagulls
+		drawModel(model_shader, seagull, glm::vec3(0.0f, 12.0f, 0.0f), glm::vec3(0.01f));
+		drawModel(model_shader, seagull, glm::vec3(3.0f, 13.0f, 0.0f), glm::vec3(0.01f), glm::vec3(0.0f, 180.0f, 0.0f));
+		// Add Player character bird
+		//drawModel(model_shader, bird, camera.Position, glm::vec3(0.01f), camera.Front + camera.Position);
+
 
 		shader.Use();
 		// skybox cube
@@ -324,4 +338,19 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
+}
+
+void drawModel(Shader& model_shader, Model& modelObj, glm::vec3 position, glm::vec3 size, glm::vec3 rotate)
+{
+	model_shader.Use();
+
+	glm::mat4 model(1.0f);
+	model = glm::translate(model, position);
+	model = glm::scale(model, size);
+	model = glm::rotate(model, rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+	model_shader.SetMatrix4("model", model);
+	modelObj.Draw(&model_shader);
 }

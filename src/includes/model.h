@@ -34,7 +34,9 @@ public:
 
 	/*  Functions   */
 	// constructor, expects a filepath to a 3D model.
-	Model(bool gamma = false) : gammaCorrection(gamma) {}
+	Model(string const& path) : gammaCorrection(false) {
+		this->LoadModel(path);
+	}
 
 
 	// draws the model, and thus all its meshes
@@ -47,7 +49,6 @@ public:
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 	void LoadModel(string const& path)
 	{
-
 		// read file via ASSIMP
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -145,7 +146,7 @@ private:
 			for (unsigned int j = 0; j < face.mNumIndices; j++)
 				indices.push_back(face.mIndices[j]);
 		}
-
+		
 		if (mesh->mMaterialIndex >= 0) {
 			// process materials
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
