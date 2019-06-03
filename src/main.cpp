@@ -29,8 +29,8 @@ unsigned int loadTexture(const char *path);
 unsigned int loadCubemap(std::vector<std::string> faces);
 
 // settings
-const unsigned int SCR_WIDTH = 1580;
-const unsigned int SCR_HEIGHT = 850;
+const unsigned int SCR_WIDTH = 1280;
+const unsigned int SCR_HEIGHT = 720;
 const char *glsl_version = "#version 330";
 
 //camera
@@ -67,7 +67,7 @@ int main()
 	// glfw: initialize and configure
 	// ------------------------------
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -99,6 +99,8 @@ int main()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+
+	/*
 	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 	glEnable(GL_DEPTH_TEST);
 
@@ -116,11 +118,13 @@ int main()
 	Shader shader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
 	Shader model_shader("../src/shaders/model_shader.vs", "../src/shaders/model_shader.fs");
 	Shader font_shader("../src/shaders/font_shader.vs", "../src/shaders/font_shader.fs");
+	
 
 	// Set font infos
 	font_shader.SetMatrix4("projection", glm::ortho(0.0f, (float)SCR_WIDTH, 0.0f, (float)SCR_HEIGHT), true);
 	// Create font renderer
 	FontRender render(&font_shader, "../resources/Font/TimesNewRoman.ttf");
+	
 
 	glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -162,6 +166,7 @@ int main()
 	Model wave("../resources/water/Wave.obj");
 	// Character birds
 	Model bird("../resources/birds/bird2/NOVELO_PARROT.obj");
+	*/
 	
 	simulation.init(window);
 
@@ -235,8 +240,8 @@ int main()
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		*/
 		
-		simulation.display();
 		
+		simulation.display();
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		glfwSwapBuffers(window);
@@ -244,9 +249,11 @@ int main()
 	}
 
 	simulation.cleanUp();
+	/*
 	// de-allocate all resources once they've outlived their purpose:
 	glDeleteVertexArrays(1, &skyboxVAO); 
 	glDeleteBuffers(1, &skyboxVAO);
+	*/
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	glfwTerminate();
 	return 0;

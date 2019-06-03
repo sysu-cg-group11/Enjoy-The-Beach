@@ -114,7 +114,7 @@ class Simulation {
     /* ********** States ********** */
 
     void init(GLFWwindow *window) {
-        glClearColor(0.0, 1.0, 1.0, 1.0);
+        glClearColor(1.0, 1.0, 1.0, 1.0);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
         onResize(window);
@@ -125,6 +125,7 @@ class Simulation {
         water.Init(water_reflection_tex_id);
         sky.Init();
         tree.Init();
+		
 
         biome_trees[NORMAL_BIOME].push_back(NORMAL_TREE);
         biome_trees[DESERT_TREE].push_back(DESERT_TREE);
@@ -142,7 +143,7 @@ class Simulation {
         // Measure speed
         ++nb_frames;
 		if (nb_frames > 40) {
-			cout << "Yeah" << endl;
+			//cout << "Yeah" << endl;
 		}
 
         if (curr_time - last_frame_cnt_time >= 1.0) { // over 1 second
@@ -310,7 +311,6 @@ class Simulation {
 
 		sky.Draw(translate(projection_matrix * model_matrix * view_matrix, cam_pos));
 
-		
         // cleanup
         // + 1 is because we are in the middle of a chunk
         // / 2 because a chunk is of length 2

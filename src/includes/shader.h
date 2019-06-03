@@ -22,6 +22,7 @@ public:
 	// State
 	GLuint ID;
 	// Constructor
+	Shader() { }
 	Shader(const char *vertexPath, const char *fragPath);
 	// Sets the current shader as active
 	Shader  &Use();

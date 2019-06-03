@@ -30,17 +30,19 @@ class PerlinTex {
     GLuint program_id_;           // GLSL shader program ID
     GLuint vertex_buffer_object_; // memory buffer
     GLuint texture_id_;           // texture ID
+	Shader shader;
 
   public:
     void Init() {
         // compile the shaders
-		Shader shader("../src/shaders/terrain/perlinTex_vshader.glsl", "../src/shaders/terrain/perlinTex_fshader.glsl");
-        program_id_ = shader.ID;
+		this->shader = Shader("../src/shaders/terrain/perlinTex_vshader.glsl", "../src/shaders/terrain/perlinTex_fshader.glsl");
+        program_id_ = this->shader.ID;
         if (!program_id_) {
             exit(EXIT_FAILURE);
         }
 
         glUseProgram(program_id_);
+		cout << program_id_ << endl;
 
         // vertex one vertex Array
         glGenVertexArrays(1, &vertex_array_id_);
@@ -119,7 +121,7 @@ class PerlinTex {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
-        // cout << "X : " << X << ", Y : " << Y << endl;
+        //cout << "X : " << X << ", Y : " << Y << endl;
 
         glUniform1i(glGetUniformLocation(program_id_, "octaves"), octave);
         glUniform1f(glGetUniformLocation(program_id_, "lac"), lac);
