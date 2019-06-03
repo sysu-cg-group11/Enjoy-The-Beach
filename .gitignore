@@ -7,5 +7,5 @@
 !README.md
 !dependencies
 !/dependencies/**
-!*.pptx
+!CG_Project.pptx
 !CMakeLists.txt
