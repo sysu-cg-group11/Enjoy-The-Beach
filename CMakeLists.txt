@@ -15,7 +15,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Od")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -39,8 +39,8 @@ include_directories(dependencies/freetype/include)
 FILE(GLOB DEPENDENCIES_SOURCE dependencies/src/*.c dependencies/src/*.cpp)
 FILE(GLOB ALL_SOURCES ${SOURCE} ${HEADER} ${DEPENDENCIES_SOURCE})
 
-
 add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
+add_definitions(-DGLM_FORCE_RADIANS)
 
 if (APPLE)
     set(os macos)
@@ -69,12 +69,14 @@ add_custom_target(copy-resources ALL
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/src/shaders ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders)
 
 
-#FIND_PACKAGE(OpenGL REQUIRED)
-#if(OpenGL_FOUND)
-#    link_directories(${OpenGL_LIBRARY_DIRS})
-#    include_directories(${OpenGL_INCLUDE_DIR})
-#    target_link_libraries(${EXECUTABLE_NAME} ${OPENGL_gl_LIBRARY})
-#endif(OpenGL_FOUND)
+# OPENGL
+find_package(OpenGL REQUIRED)
+include_directories(${OpenGL_INCLUDE_DIRS})
+link_directories(${OpenGL_LIBRARY_DIRS})
+add_definitions(${OpenGL_DEFINITIONS})
+if(NOT OPENGL_FOUND) 
+    message(ERROR " OPENGL not found!")
+endif()
 
 target_link_libraries(${EXECUTABLE_NAME} glfw)
 target_link_libraries(${EXECUTABLE_NAME} imgui)

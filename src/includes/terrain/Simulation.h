@@ -114,16 +114,13 @@ class Simulation {
     /* ********** States ********** */
 
     void init(GLFWwindow *window) {
-		cout << "Init" << endl;
-        glClearColor(1.0, 1.0, 1.0, 1.0);
+        glClearColor(0.0, 1.0, 1.0, 1.0);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
         onResize(window);
-		cout << 1 << endl;
         perlin_tex.Init();
 		
         grid.Init();
-		cout << 2 << endl;
         GLuint water_reflection_tex_id = water_reflection.Init(window_width, window_height, false, GL_RGB8, GL_RGB);
         water.Init(water_reflection_tex_id);
         sky.Init();
@@ -144,11 +141,16 @@ class Simulation {
 
         // Measure speed
         ++nb_frames;
+		if (nb_frames > 40) {
+			cout << "Yeah" << endl;
+		}
+
         if (curr_time - last_frame_cnt_time >= 1.0) { // over 1 second
             cout << nb_frames << " frames" << endl;
             nb_frames = 0;
             last_frame_cnt_time = curr_time;
         }
+
         last_frame_time = curr_time;
 
         // Camera movements
@@ -308,6 +310,7 @@ class Simulation {
 
 		sky.Draw(translate(projection_matrix * model_matrix * view_matrix, cam_pos));
 
+		
         // cleanup
         // + 1 is because we are in the middle of a chunk
         // / 2 because a chunk is of length 2

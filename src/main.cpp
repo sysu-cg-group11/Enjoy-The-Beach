@@ -51,6 +51,17 @@ glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
 
 Simulation simulation;
 
+void bind_mouse(GLFWwindow *window, double x, double y) { simulation.onMouseMove(window, x, y); }
+
+void bind_resize(GLFWwindow *window, int width, int height) {
+	(void)width, (void)height;
+	simulation.onResize(window);
+}
+
+void bind_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
+	simulation.onKey(window, key, scancode, action, mods);
+}
+
 int main()
 {
 	// glfw: initialize and configure
@@ -74,9 +85,10 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
+	glfwSetKeyCallback(window, bind_key);
+	glfwSetWindowSizeCallback(window, bind_resize);
+	glfwSetCursorPosCallback(window, bind_mouse);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -222,13 +234,16 @@ int main()
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		*/
-
+		
 		simulation.display();
+		
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	simulation.cleanUp();
 	// de-allocate all resources once they've outlived their purpose:
 	glDeleteVertexArrays(1, &skyboxVAO); 
 	glDeleteBuffers(1, &skyboxVAO);
