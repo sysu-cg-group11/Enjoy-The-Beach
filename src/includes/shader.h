@@ -1,46 +1,44 @@
 #ifndef SHADER_M_H
 #define SHADER_M_H
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <fstream>
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <list>
+
+#include <terrainEngine/BaseShader.h>
 
 
-// General purpsoe shader object. Compiles from file, generates
-// compile/link-time error messages and hosts several utility 
-// functions for easy management.
 class Shader
 {
 public:
-	// State
-	GLuint ID;
-	// Constructor
-	Shader() { }
-	Shader(const char *vertexPath, const char *fragPath);
-	// Sets the current shader as active
-	Shader  &Use();
-	// Compiles the shader from given source code
-	void    Compile(const GLchar *vertexSource, const GLchar *fragmentSource, const GLchar *geometrySource = nullptr); // Note: geometry source code is optional 
-																													   // Utility functions
-	void    SetFloat(const GLchar *name, GLfloat value, GLboolean useShader = false);
-	void    SetInteger(const GLchar *name, GLint value, GLboolean useShader = false);
-	void    SetVector2f(const GLchar *name, GLfloat x, GLfloat y, GLboolean useShader = false);
-	void    SetVector2f(const GLchar *name, const glm::vec2 &value, GLboolean useShader = false);
-	void    SetVector3f(const GLchar *name, GLfloat x, GLfloat y, GLfloat z, GLboolean useShader = false);
-	void    SetVector3f(const GLchar *name, const glm::vec3 &value, GLboolean useShader = false);
-	void    SetVector4f(const GLchar *name, GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLboolean useShader = false);
-	void    SetVector4f(const GLchar *name, const glm::vec4 &value, GLboolean useShader = false);
-	void    SetMatrix4(const GLchar *name, const glm::mat4 &matrix, GLboolean useShader = false);
-private:
-	// Checks if compilation or linking failed and if so, print the error logs
-	void    checkCompileErrors(GLuint object, std::string type, const GLchar* codes);
+	Shader(std::string name);
+	Shader(std::string name, const char * computeShader);
+	Shader * attachShader(BaseShader s);
+	void linkPrograms();
+
+	virtual ~Shader();
+	void use();
+	void setBool(const std::string &name, bool value) const;
+	void setInt(const std::string &name, int value) const;
+	void setFloat(const std::string &name, float value) const;
+	void setVec2(const std::string &name, glm::vec2 vector) const;
+	void setVec3(const std::string &name, glm::vec3 vector) const;
+	void setVec4(const std::string &name, glm::vec4 vector) const;
+	void setMat4(const std::string &name, glm::mat4 matrix) const;
+	void setSampler2D(const std::string &name, unsigned int texture, int id) const;
+	void setSampler3D(const std::string &name, unsigned int texture, int id) const;
+
+protected:
+	unsigned int ID;
+	bool linked, isCompute;
+	std::list<unsigned int> shaders;
+	std::string name;
 };
+
 
 #endif

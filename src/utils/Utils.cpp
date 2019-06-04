@@ -1,174 +1,122 @@
-//
-// Created by Miguel Chan on 2019-04-02.
-//
+#include "terrainEngine/utils.h"
+#include <random>
 
-#include "Utils.h"
-#include <shared_mutex>
+void initializePlaneVAO(const int res, const int width, GLuint * planeVAO, GLuint * planeVBO, GLuint * planeEBO) {
 
-using namespace std;
+	//const int res = 3;
+	const int nPoints = res * res;
+	const int size = nPoints * 3 + nPoints * 3 + nPoints * 2;
+	float * vertices = new float[size];
+	for (int i = 0; i < res; i++) {
+		for (int j = 0; j < res; j++) {
+			//add position
+			float x = j * (float)width / (res - 1) - width / 2.0;
+			float y = 0.0;
+			float z = -i * (float)width / (res - 1) + width / 2.0;
 
-namespace Utils {
+			vertices[(i + j * res) * 8] = x; //8 = 3 + 3 + 2, float per point
+			vertices[(i + j * res) * 8 + 1] = y;
+			vertices[(i + j * res) * 8 + 2] = z;
 
-    void enableDepthTest() {
-        glEnable(GL_DEPTH_TEST);
-    }
+			//add normal
+			float x_n = 0.0;
+			float y_n = 1.0;
+			float z_n = 0.0;
 
-    void disableDepthTest() {
-        glDisable(GL_DEPTH_TEST);
-    }
+			vertices[(i + j * res) * 8 + 3] = x_n;
+			vertices[(i + j * res) * 8 + 4] = y_n;
+			vertices[(i + j * res) * 8 + 5] = z_n;
 
-    struct ScreenSize {
-        GLuint screenWidth, screenHeight;
-        mutable shared_mutex mutex;
-    } screenSize;
+			//add texcoords
+			vertices[(i + j * res) * 8 + 6] = (float)j / (res - 1);
+			vertices[(i + j * res) * 8 + 7] = (float)(res - i - 1) / (res - 1);
+		}
+	}
 
-    std::pair<GLuint, GLuint> getScreenSize() {
-        shared_lock<shared_mutex> guard(screenSize.mutex);
-        return {screenSize.screenWidth, screenSize.screenHeight};
-    }
+	const int nTris = (res - 1)*(res - 1) * 2;
+	int * trisIndices = new int[nTris * 3];
 
-    void setScreenSize(GLuint w, GLuint h) {
-        unique_lock<shared_mutex> guard(screenSize.mutex);
-        screenSize.screenWidth = w;
-        screenSize.screenHeight = h;
-    }
+	for (int i = 0; i < nTris; i++) {
+		int trisPerRow = 2 * (res - 1);
+		for (int j = 0; j < trisPerRow; j++) {
+			if (!(i % 2)) { //upper triangle
+				int k = i * 3;
+				int triIndex = i % trisPerRow;
 
-    void printMat4(const glm::mat4 &mat) {
-        for (int i = 0; i < 4; i++) {
-            for (int k = 0; k < 4; k++) {
-                cout << mat[k][i] << ' ';
-            }
-            cout << endl;
-        }
-        cout << endl;
-    }
+				int row = i / trisPerRow;
+				int col = triIndex / 2;
+				trisIndices[k] = row * res + col;
+				trisIndices[k + 1] = ++row*res + col;
+				trisIndices[k + 2] = --row* res + ++col;
+			}
+			else {
+				int k = i * 3;
+				int triIndex = i % trisPerRow;
 
-    void printVec3(const glm::vec3 &vec) {
-        cout << vec.x << ' ' << vec.y << ' ' << vec.z << endl;
-    }
+				int row = i / trisPerRow;
+				int col = triIndex / 2;
+				trisIndices[k] = row * res + ++col;
+				trisIndices[k + 1] = ++row * res + --col;
+				trisIndices[k + 2] = row * res + ++col;
+			}
+		}
+	}
 
+	/*
+	for (int i = 0; i < res; i++) {
+		for (int j = 0; j < res; j++) {
+			for (int k = 0; k < 8; k++) {
+				if (k == 3 || k == 6)
+					std::cout << std::endl;
+				std::cout << vertices[(i + j * res) * 8 + k] << ", ";
+			}
+			std::cout << std::endl;
+		}
+	}
 
-    GLToolsException::GLToolsException(const char *msg) : msg(msg) {}
+	for (int i = 0; i < nTris; i++) {
+		for (int k = 0; k < 3; k++)
+		{
+			std::cout << trisIndices[i * 3 + k] << ", ";
+		}
+		std::cout << std::endl;
 
-    const char *GLToolsException::what() const noexcept {
-        return msg.c_str();
-    }
+	}
 
-    auto vertexAttribSetter = []() {
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
-        glEnableVertexAttribArray(0);
-        //Color
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-    };
+	std::cout << "TRISINDICES: " << nTris * 3 << std::endl;
+	*/
+	glGenVertexArrays(1, planeVAO);
+	glGenBuffers(1, planeVBO);
+	glGenBuffers(1, planeEBO);
 
-    void VertexArrayBuffer::bind() {
-        VAO->bind();
-        VBO->bind();
-    }
+	glBindVertexArray(*planeVAO);
 
-    VertexArrayBuffer::VertexArrayBuffer(int size, float *data, const std::function<void()> &vertexAttribCallback) {
-        VAO = make_shared<VertexArrayObject>();
-        VAO->bind();
-        VBO = make_shared<VertexBufferObject>(size, data);
-        VAO->setAttrib(vertexAttribCallback);
-    }
+	glBindBuffer(GL_ARRAY_BUFFER, *planeVBO);
+	glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), vertices, GL_STATIC_DRAW);
 
-    GLuint VertexArrayBuffer::getVAO() {
-        return VAO->VAO;
-    }
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *planeEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nTris * 3 * sizeof(unsigned int), trisIndices, GL_STATIC_DRAW);
 
-    GLuint VertexArrayBuffer::getVBO() {
-        return VBO->VBO;
-    }
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	glBindVertexArray(0);
 
-    VertexArrayBuffer::VertexArrayBuffer(std::shared_ptr<VertexBufferObject> vbo,
-                                         const std::function<void()> &vertexAttribCallback) {
-        VAO = make_shared<VertexArrayObject>();
-        VAO->bind();
-        VBO = std::move(vbo);
-        VBO->bind();
-        VAO->setAttrib(vertexAttribCallback);
-    }
+	delete[] vertices;
+}
 
+glm::vec3 genRandomVec3() {
+	std::random_device rd;  //Will be used to obtain a seed for the random number engine
+	std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+	std::uniform_real_distribution<> dis(.0, 100.);
 
-    ElementBuffer::~ElementBuffer() {
-        glDeleteBuffers(1, &EBO);
-    }
+	float x, y, z;
+	x = dis(gen);
+	y = dis(gen);
+	z = dis(gen);
 
-    ElementBuffer::ElementBuffer(GLuint VAO, int size, unsigned int *data) {
-        glBindVertexArray(VAO);
-        glGenBuffers(1, &EBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        if (size != 0 && data != nullptr) {
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-        }
-        glBindVertexArray(0);
-    }
-
-    VertexBufferObject::VertexBufferObject(int size, float *data) {
-        glGenBuffers(1, &VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        if (size != 0 && data != nullptr) {
-            glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-        }
-    }
-
-    VertexBufferObject::~VertexBufferObject() {
-        glDeleteBuffers(1, &VBO);
-    }
-
-    void VertexBufferObject::bind() {
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    }
-
-    void VertexBufferObject::unbind() {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    VertexArrayObject::~VertexArrayObject() {
-        glDeleteVertexArrays(1, &VAO);
-    }
-
-    VertexArrayObject::VertexArrayObject() {
-        glGenVertexArrays(1, &VAO);
-        glBindVertexArray(VAO);
-
-    }
-
-    void VertexArrayObject::unbind() {
-        glBindVertexArray(0);
-    }
-
-    void VertexArrayObject::bind() {
-        glBindVertexArray(VAO);
-    }
-
-    void VertexArrayObject::setAttrib(const std::function<void()> &vertexAttribCallback) {
-        vertexAttribCallback();
-    }
-
-    FrameBuffer::~FrameBuffer() {
-        glDeleteFramebuffers(1, &FBO);
-    }
-
-    FrameBuffer::FrameBuffer() {
-        glGenFramebuffers(1, &FBO);
-    }
-
-    void FrameBuffer::bind() {
-        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    }
-
-    void FrameBuffer::unbind() {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-
-    glm::mat4 OrthoParam::mat() {
-        return glm::ortho(left, right, bottom, top, zNear, zFar);
-    }
-
-    glm::mat4 PerspectiveParam::mat() {
-        return glm::perspective(fovy, aspect, zNear, zFar);
-    }
+	return glm::vec3(x, y, z);
 }

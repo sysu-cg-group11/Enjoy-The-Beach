@@ -11,10 +11,6 @@ FILE(GLOB_RECURSE HEADER ${SOURCE_DIR}/*.h ${SOURCE_DIR}/*.hpp)
 
 include_directories(src/includes)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
-
 set(CMAKE_CXX_FLAGS_DEBUG "-g -fvisibility=hidden -fvisibility-inlines-hidden")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fvisibility=hidden -fvisibility-inlines-hidden")
 
