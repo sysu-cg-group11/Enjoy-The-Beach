@@ -1,6 +1,8 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <glad/glad.h> // holds all OpenGL type declarations
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -75,12 +77,12 @@ public:
 			else if (name == "texture_height")
 				number = std::to_string(heightNr++);
 			else if (name == "color_diffuse") {
-				shader->setVec3("sprite_color", textures[i].color);
-				shader->setInt("type", 1);
+				shader->SetVector3f("sprite_color", textures[i].color);
+				shader->SetInteger("type", 1);
 				continue;
 			}
-			shader->setVec3("sprite_color", glm::vec3(1, 1, 1));
-			shader->setInt("type", 0);
+			shader->SetVector3f("sprite_color", glm::vec3(1, 1, 1));
+			shader->SetInteger("type", 0);
 
 			glActiveTexture(GL_TEXTURE0 + i);
 			glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), i);

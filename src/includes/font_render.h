@@ -1,6 +1,7 @@
 #ifndef FONT_RENDER_H
 #define FONT_RENDER_H
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
@@ -118,9 +119,9 @@ void FontRender::InitFont(const GLchar* path)
 void FontRender::RenderText(string text, glm::vec2 postion, GLfloat scale, glm::vec3 color)
 {
 	// Activate corresponding render state	
-	this->fontShader->use();
-	this->fontShader->setVec3("textColor", color);
-	this->fontShader->setInt("text", 0);
+	this->fontShader->Use();
+	this->fontShader->SetVector3f("textColor", color);
+	this->fontShader->SetInteger("text", 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(this->fontVAO);
 
