@@ -47,6 +47,9 @@
 
 int main()
 {
+#ifdef __APPLE__
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
+#endif
 	// camera and window setup
 	glm::vec3 startPosition(0.0f, 800.0f, 0.0f);
 	Camera camera(startPosition);

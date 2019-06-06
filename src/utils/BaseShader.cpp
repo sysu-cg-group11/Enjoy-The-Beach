@@ -100,6 +100,7 @@ shaderType getShaderType(const char* path) {
 		return shaderType(GL_GEOMETRY_SHADER, "GEOMETRY");
 	if (type == "comp")
 		return shaderType(GL_COMPUTE_SHADER, "COMPUTE") ;
+	throw "Unexpected shader type";
 }
 
 

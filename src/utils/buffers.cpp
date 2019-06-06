@@ -113,7 +113,7 @@ FrameBufferObject::FrameBufferObject(int W_, int H_, const int nColorAttachments
 	this->H = H_;
 	this->FBO = createFrameBuffer();
 
-	this->tex = NULL;
+	this->tex = 0;
 	this->depthTex = createDepthTextureAttachment(W, H);
 	this->colorAttachments = createColorAttachments(W, H, nColorAttachments);
 	this->nColorAttachments = nColorAttachments;
@@ -123,7 +123,7 @@ FrameBufferObject::FrameBufferObject(int W_, int H_, const int nColorAttachments
 		colorAttachmentsFlag[i] = GL_COLOR_ATTACHMENT0 + i;
 	}
 	glDrawBuffers(nColorAttachments, colorAttachmentsFlag);
-	delete colorAttachmentsFlag;
+	delete[]colorAttachmentsFlag;
 }
 
 

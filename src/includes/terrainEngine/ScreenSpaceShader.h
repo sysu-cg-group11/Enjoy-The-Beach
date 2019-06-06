@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SCREEN_SPACE_SHADER_H
+#define SCREEN_SPACE_SHADER_H
 #include "shader.h"
 #include "drawableObject.h"
 
@@ -13,7 +14,7 @@ public:
 		return shad;
 	}
 
-	Shader & const getShader() {
+	Shader & getShader() {
 		return *shad;
 	}
 
@@ -38,3 +39,6 @@ private:
 
 	void initializeQuad();
 };
+
+
+#endif
