@@ -25,6 +25,7 @@ public:
 
 	void Render(Shader& shader);
 	void SingleRender(Shader& shader, int count, glm::vec3* position, CubeRender::BlockType block);
+	void DrawTree(CubeRender::BlockType tree_type, CubeRender::BlockType leave_type, glm::vec3 pos, Shader& shader);
 
 private:
 	static WorldRender* instance;

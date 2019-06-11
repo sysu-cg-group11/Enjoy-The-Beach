@@ -203,9 +203,9 @@ int main()
 		model_shader.SetVector3f("lightColor", glm::vec3(1, 1, 1));
 		model_shader.SetVector3f("lightPos", glm::vec3(lightValue[0], lightValue[1], lightValue[2]));
 		model_shader.SetFloat("ambientStrength", 0.3f);
-		model_shader.SetFloat("shininess", 64.0f);
-		model_shader.SetFloat("diffuseFactor", 1.0f);
-		model_shader.SetFloat("specularStrength", 1.0f);
+		model_shader.SetFloat("shininess", 10.0f);
+		model_shader.SetFloat("diffuseFactor", 0.5f);
+		model_shader.SetFloat("specularStrength", 0.5f);
 		model_shader.SetInteger("diffuseTexture", 0);
 		model_shader.SetInteger("shadowMap", 1);
 
