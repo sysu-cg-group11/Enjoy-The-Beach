@@ -12,8 +12,9 @@
 #include <shader.h>
 #include <data.h>
 #include <camera.h>
-#include <font_render.h>
-#include <world_render.h>
+#include "font_render.h"
+#include "world_render.h"
+#include "model.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -38,7 +39,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // View position and light position
-float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { 0.0, 50.0, 0.0 };
+float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { 0.0, 100.0, 0.0 };
 
 // Head themes location
 glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
@@ -140,14 +141,14 @@ int main()
 	shader.SetInteger("skybox", 0);
 
 	// Load all .obj models
-	/*
+
 	Model mainBeach("../resources/beach/Beach.obj");
 	Model smallBeach("../resources/beach/model.obj");
 	Model seagull("../resources/seagull/Flying gull Texture 2.obj");
 	Model wave("../resources/water/Wave.obj");
 	// Character birds
 	Model bird("../resources/birds/bird2/NOVELO_PARROT.obj");
-	*/
+
 
 	WorldRender* world = WorldRender::getInstance();
 
@@ -170,7 +171,7 @@ int main()
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::Begin("Skybox\n");
+		ImGui::Begin("Beach\n");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 
@@ -202,25 +203,33 @@ int main()
 		model_shader.SetVector3f("viewPos", camera.Position);
 		model_shader.SetVector3f("lightColor", glm::vec3(1, 1, 1));
 		model_shader.SetVector3f("lightPos", glm::vec3(lightValue[0], lightValue[1], lightValue[2]));
-		model_shader.SetFloat("ambientStrength", 0.3f);
-		model_shader.SetFloat("shininess", 10.0f);
-		model_shader.SetFloat("diffuseFactor", 0.5f);
-		model_shader.SetFloat("specularStrength", 0.5f);
+		model_shader.SetFloat("ambientStrength", 0.2f);
+		model_shader.SetFloat("shininess", 32.0f);
+		model_shader.SetFloat("diffuseFactor", 0.6f);
+		model_shader.SetFloat("specularStrength", 0.8f);
 		model_shader.SetInteger("diffuseTexture", 0);
 		model_shader.SetInteger("shadowMap", 1);
 
-		world->Render(model_shader);
-		/*
-		// Draw Models
-		drawModel(model_shader, mainBeach, glm::vec3(35.0f, 6.0f, 20.0f), glm::vec3(0.000011f, 0.00002f, 0.00002f));
-		drawModel(model_shader, smallBeach, glm::vec3(5.0f, 7.8f, 5.0f), glm::vec3(8.0f, 8.0f, 8.0f));
-		drawModel(model_shader, wave, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.00011f, 0.00004f, 0.00011f));
-		// Add seagulls
-		drawModel(model_shader, seagull, glm::vec3(0.0f, 12.0f, 0.0f), glm::vec3(0.01f));
-		drawModel(model_shader, seagull, glm::vec3(3.0f, 13.0f, 0.0f), glm::vec3(0.01f), glm::vec3(0.0f, 180.0f, 0.0f));
-		// Add Player character bird
-		//drawModel(model_shader, bird, camera.Position, glm::vec3(0.01f), camera.Front + camera.Position);
-		*/
+        GLfloat near_plane = 1.0f, far_plane = 7.5f;
+        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        glm::mat4 lightSpaceMatrix = lightProjection * view;
+        model_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+
+        world->drawScene(model_shader);
+        world->drawObject(model_shader);
+
+
+        /*
+        // Draw Models
+        drawModel(model_shader, mainBeach, glm::vec3(35.0f, 6.0f, 20.0f), glm::vec3(0.000011f, 0.00002f, 0.00002f));
+        drawModel(model_shader, smallBeach, glm::vec3(5.0f, 7.8f, 5.0f), glm::vec3(8.0f, 8.0f, 8.0f));
+        drawModel(model_shader, wave, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.00011f, 0.00004f, 0.00011f));
+        // Add seagulls
+        drawModel(model_shader, seagull, glm::vec3(0.0f, 12.0f, 0.0f), glm::vec3(0.01f));
+        drawModel(model_shader, seagull, glm::vec3(3.0f, 13.0f, 0.0f), glm::vec3(0.01f), glm::vec3(0.0f, 180.0f, 0.0f));
+        // Add Player character bird
+        //drawModel(model_shader, bird, camera.Position, glm::vec3(0.01f), camera.Front + camera.Position);
+        */
 
 		shader.Use();
 		// skybox cube

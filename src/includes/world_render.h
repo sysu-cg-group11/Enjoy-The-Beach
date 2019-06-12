@@ -3,33 +3,38 @@
 
 #include <shader.h>
 #include <cube_render.h>
+#include <memory>
 
-class WorldRender
-{
+
+class WorldRender {
 public:
-	WorldRender() {
-		this->renderer = new CubeRender;
-		renderer->initTextures();
-		renderer->InitCube();
-	}
-	~WorldRender() {
-		delete this->renderer;
-	}
 
-	static WorldRender* getInstance() {
-		if (instance == NULL){
-			instance = new WorldRender;
-		}
-		return instance;
-	}
+    WorldRender() {
+        this->renderer = new CubeRender;
+        renderer->initTextures();
+        renderer->InitCube();
+    }
 
-	void Render(Shader& shader);
-	void SingleRender(Shader& shader, int count, glm::vec3* position, CubeRender::BlockType block);
-	void DrawTree(CubeRender::BlockType tree_type, CubeRender::BlockType leave_type, glm::vec3 pos, Shader& shader);
+    ~WorldRender() {
+        delete this->renderer;
+    }
+
+    static WorldRender *getInstance() {
+        static WorldRender renderer;
+        return &renderer;
+    }
+
+
+    void SingleRender(Shader &shader, int count, glm::vec3 *position, CubeRender::BlockType block);
+
+    void DrawTree(CubeRender::BlockType tree_type, CubeRender::BlockType leave_type, glm::vec3 pos, Shader &shader);
+
+    void drawObject(Shader &shader);
+
+    void drawScene(Shader &shader);
 
 private:
-	static WorldRender* instance;
-	CubeRender* renderer;
+    CubeRender *renderer;
 };
 
 

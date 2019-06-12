@@ -39,7 +39,6 @@ include_directories(dependencies/freetype/include)
 FILE(GLOB DEPENDENCIES_SOURCE dependencies/src/*.c dependencies/src/*.cpp)
 FILE(GLOB ALL_SOURCES ${SOURCE} ${HEADER} ${DEPENDENCIES_SOURCE})
 
-add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
 add_definitions(-DGLM_FORCE_RADIANS)
 
 if (APPLE)

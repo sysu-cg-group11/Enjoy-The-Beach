@@ -13,134 +13,132 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+
 using namespace std;
 
 struct Vertex {
-	// position
-	glm::vec3 Position;
-	// normal
-	glm::vec3 Normal;
-	// texCoords
-	glm::vec2 TexCoords;
-	// tangent
-	glm::vec3 Tangent;
-	// bitangent
-	glm::vec3 Bitangent;
+    // position
+    glm::vec3 Position;
+    // normal
+    glm::vec3 Normal;
+    // texCoords
+    glm::vec2 TexCoords;
+    // tangent
+    glm::vec3 Tangent;
+    // bitangent
+    glm::vec3 Bitangent;
 };
 
 struct Texture {
-	unsigned int id;
-	string type;
-	string path;
-	glm::vec3 color;
+    unsigned int id;
+    string type;
+    string path;
+    glm::vec3 color;
 };
 
 class Mesh {
 public:
-	/*  Mesh Data  */
-	vector<Vertex> vertices;
-	vector<unsigned int> indices;
-	vector<Texture> textures;
-	unsigned int VAO;
+    /*  Mesh Data  */
+    vector<Vertex> vertices;
+    vector<unsigned int> indices;
+    vector<Texture> textures;
+    unsigned int VAO;
 
-	/*  Functions  */
-	// constructor
-	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
-	{
-		this->vertices = vertices;
-		this->indices = indices;
-		this->textures = textures;
+    /*  Functions  */
+    // constructor
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures) {
+        this->vertices = vertices;
+        this->indices = indices;
+        this->textures = textures;
 
-		// now that we have all the required data, set the vertex buffers and its attribute pointers.
-		setupMesh();
-	}
+        // now that we have all the required data, set the vertex buffers and its attribute pointers.
+        setupMesh();
+    }
 
-	// render the mesh
-	void Draw(Shader* shader)
-	{
-		// bind appropriate textures
-		unsigned int diffuseNr = 0;
-		unsigned int specularNr = 0;
-		unsigned int normalNr = 0;
-		unsigned int heightNr = 0;
-		for (unsigned int i = 0; i < textures.size(); i++)
-		{
-			string number;
-			string name = textures[i].type;
+    // render the mesh
+    void Draw(Shader *shader) {
+        // bind appropriate textures
+        unsigned int diffuseNr = 0;
+        unsigned int specularNr = 0;
+        unsigned int normalNr = 0;
+        unsigned int heightNr = 0;
+        for (unsigned int i = 0; i < textures.size(); i++) {
+            string number;
+            string name = textures[i].type;
 
-			if (name == "texture_diffuse")
-				number = std::to_string(diffuseNr++);
-			else if (name == "texture_specular")
-				number = std::to_string(specularNr++);
-			else if (name == "texture_normal")
-				number = std::to_string(normalNr++);
-			else if (name == "texture_height")
-				number = std::to_string(heightNr++);
-			else if (name == "color_diffuse") {
-				shader->SetVector3f("sprite_color", textures[i].color);
-				shader->SetInteger("type", 1);
-				continue;
-			}
-			shader->SetVector3f("sprite_color", glm::vec3(1, 1, 1));
-			shader->SetInteger("type", 0);
+            if (name == "texture_diffuse")
+                number = std::to_string(diffuseNr++);
+            else if (name == "texture_specular")
+                number = std::to_string(specularNr++);
+            else if (name == "texture_normal")
+                number = std::to_string(normalNr++);
+            else if (name == "texture_height")
+                number = std::to_string(heightNr++);
+            else if (name == "color_diffuse") {
+                shader->SetVector3f("sprite_color", textures[i].color);
+                shader->SetInteger("type", 1);
+                continue;
+            }
+            shader->SetVector3f("sprite_color", glm::vec3(1, 1, 1));
+            shader->SetInteger("type", 0);
 
-			glActiveTexture(GL_TEXTURE0 + i);
-			glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), i);
-			// and finally bind the texture
-			glBindTexture(GL_TEXTURE_2D, textures[i].id);
-		}
+            glActiveTexture(GL_TEXTURE0 + i);
+            glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), i);
+            // and finally bind the texture
+            glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        }
 
-		// draw mesh
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+        // draw mesh
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
-		// always good practice to set everything back to defaults once configured.
-		glActiveTexture(GL_TEXTURE0);
-	}
+        // always good practice to set everything back to defaults once configured.
+        glActiveTexture(GL_TEXTURE0);
+    }
 
 private:
-	/*  Render data  */
-	unsigned int VBO, EBO;
+    /*  Render data  */
+    unsigned int VBO, EBO;
 
-	/*  Functions    */
-	// initializes all the buffer objects/arrays
-	void setupMesh()
-	{
-		// create buffers/arrays
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glGenBuffers(1, &EBO);
+    /*  Functions    */
+    // initializes all the buffer objects/arrays
+    void setupMesh() {
+        // create buffers/arrays
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
 
-		glBindVertexArray(VAO);
-		// load data into vertex buffers
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		// A great thing about structs is that their memory layout is sequential for all its items.
-		// The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
-		// again translates to 3/2 floats which translates to a byte array.
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+        glBindVertexArray(VAO);
+        // load data into vertex buffers
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        // A great thing about structs is that their memory layout is sequential for all its items.
+        // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
+        // again translates to 3/2 floats which translates to a byte array.
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
-		// set the vertex attribute pointers
-		// vertex Positions
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-		// vertex normals
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-		// vertex texture coords
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
-		// vertex tangent
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
-		// vertex bitangent
-		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
+        // set the vertex attribute pointers
+        // vertex Positions
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
+        // vertex normals
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Normal));
+        // vertex texture coords
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, TexCoords));
+        // vertex tangent
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Tangent));
+        // vertex bitangent
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Bitangent));
 
-		glBindVertexArray(0);
-	}
+        glBindVertexArray(0);
+    }
 };
+
 #endif

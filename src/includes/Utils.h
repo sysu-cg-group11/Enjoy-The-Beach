@@ -29,11 +29,13 @@ namespace Utils {
 
     struct OrthoParam {
         float left, right, bottom, top, zNear, zFar;
+
         glm::mat4 mat();
     };
 
     struct PerspectiveParam {
         float fovy, aspect, zNear, zFar;
+
         glm::mat4 mat();
     };
 
@@ -91,7 +93,6 @@ namespace Utils {
     };
 
 
-
     struct FrameBuffer {
         GLuint FBO;
 
@@ -105,9 +106,6 @@ namespace Utils {
 
         ~FrameBuffer();
     };
-
-
-
 
 
     class GLToolsException : public std::exception {
