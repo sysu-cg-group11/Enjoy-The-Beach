@@ -53,15 +53,15 @@ void WorldRender::drawScene(Shader &shader) {
     SingleRender(shader, sand_count, sand_position, renderer->SAND);
 
     // Render Water
-    glm::vec3 water_position[100];
-    int water_count = 100;
-    index = 0;
-    for (int i = -20; i < -10; i++) {
-        for (int j = -20; j < -10; j++) {
-            glm::vec3 pos = glm::vec3((float) i, 0.0f, (float) j);
-            water_position[index++] = pos;
-        }
-    }
+	glm::vec3 water_position[6400];
+	int water_count = 6400;
+	index = 0;
+	for (int i = -40; i < 40; i++) {
+		for (int j = -40; j < 40; j++) {
+			glm::vec3 pos = glm::vec3((float)i, 0.0f, (float)j);
+			water_position[index++] = pos;
+		}
+	}
 
 
     SingleRender(shader, water_count, water_position, renderer->WATER);

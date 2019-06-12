@@ -21,7 +21,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-//void drawModel(Shader& model_shader, Model& model, glm::vec3 position, glm::vec3 size = glm::vec3(1.0f), glm::vec3 rotate = glm::vec3(0.0f));
+void drawModel(Shader& model_shader, Model& model, glm::vec3 position, glm::vec3 size = glm::vec3(1.0f), glm::vec3 rotate = glm::vec3(0.0f));
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
@@ -142,13 +142,8 @@ int main()
 
 	// Load all .obj models
 
-	Model mainBeach("../resources/beach/Beach.obj");
-	Model smallBeach("../resources/beach/model.obj");
+	Model beach("../resources/beach/model.obj");
 	Model seagull("../resources/seagull/Flying gull Texture 2.obj");
-	Model wave("../resources/water/Wave.obj");
-	// Character birds
-	Model bird("../resources/birds/bird2/NOVELO_PARROT.obj");
-
 
 	WorldRender* world = WorldRender::getInstance();
 
@@ -209,8 +204,10 @@ int main()
 		model_shader.SetFloat("specularStrength", 0.8f);
 		model_shader.SetInteger("diffuseTexture", 0);
 		model_shader.SetInteger("shadowMap", 1);
+		model_shader.SetInteger("type", 0);
+		model_shader.SetVector3f("sprite_color", glm::vec3(1, 1, 1));
 
-        GLfloat near_plane = 1.0f, far_plane = 7.5f;
+        GLfloat near_plane = -10.0f, far_plane = 100.0f;
         glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         glm::mat4 lightSpaceMatrix = lightProjection * view;
         model_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
@@ -218,18 +215,9 @@ int main()
         world->drawScene(model_shader);
         world->drawObject(model_shader);
 
-
-        /*
-        // Draw Models
-        drawModel(model_shader, mainBeach, glm::vec3(35.0f, 6.0f, 20.0f), glm::vec3(0.000011f, 0.00002f, 0.00002f));
-        drawModel(model_shader, smallBeach, glm::vec3(5.0f, 7.8f, 5.0f), glm::vec3(8.0f, 8.0f, 8.0f));
-        drawModel(model_shader, wave, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.00011f, 0.00004f, 0.00011f));
-        // Add seagulls
-        drawModel(model_shader, seagull, glm::vec3(0.0f, 12.0f, 0.0f), glm::vec3(0.01f));
-        drawModel(model_shader, seagull, glm::vec3(3.0f, 13.0f, 0.0f), glm::vec3(0.01f), glm::vec3(0.0f, 180.0f, 0.0f));
-        // Add Player character bird
-        //drawModel(model_shader, bird, camera.Position, glm::vec3(0.01f), camera.Front + camera.Position);
-        */
+		drawModel(model_shader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(5.0f));
+        drawModel(model_shader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
+        drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
 
 		shader.Use();
 		// skybox cube
@@ -305,7 +293,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-/*
+
 void drawModel(Shader& model_shader, Model& modelObj, glm::vec3 position, glm::vec3 size, glm::vec3 rotate)
 {
 	model_shader.Use();
@@ -320,4 +308,3 @@ void drawModel(Shader& model_shader, Model& modelObj, glm::vec3 position, glm::v
 	model_shader.SetMatrix4("model", model);
 	modelObj.Draw(&model_shader);
 }
-*/

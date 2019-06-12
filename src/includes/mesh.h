@@ -80,7 +80,7 @@ public:
                 continue;
             }
             shader->SetVector3f("sprite_color", glm::vec3(1, 1, 1));
-            shader->SetInteger("type", 0);
+            shader->SetInteger("type", 2);
 
             glActiveTexture(GL_TEXTURE0 + i);
             glUniform1i(glGetUniformLocation(shader->ID, (name + number).c_str()), i);
