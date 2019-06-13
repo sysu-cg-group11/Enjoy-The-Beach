@@ -122,7 +122,7 @@ int main() {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 
     // build and compile our shader program
@@ -183,6 +183,7 @@ int main() {
 
         glDepthFunc(GL_LEQUAL);
 
+        glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
 
         glm::mat3 temp(camera.GetViewMatrix());
         glm::mat4 view = glm::mat4(temp);
@@ -191,7 +192,7 @@ int main() {
                                                 500.0f);
 
 
-        GLfloat near_plane = -20.0f, far_plane = 20.0f;
+        GLfloat near_plane = 1.0f, far_plane = 10.0f;
         glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         glm::mat4 lightView = glm::lookAt(glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.0f),
                                           glm::vec3(0.0, 1.0, 0.0));
@@ -206,11 +207,14 @@ int main() {
         shadow.shadowShader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
         //Draw scene from light's perspective
-        drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
-        drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f),
-                  glm::vec3(0.0f, 180.0f, 0.0f));
-        drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(5.0f));
+        world.drawScene(shadow.shadowShader);
         world.drawObject(shadow.shadowShader);
+
+        drawModel(shadow.shadowShader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
+        drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(5.0f));
+        drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
+        drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+
 
         shadow.unbind(prevViewport);
 
@@ -223,6 +227,8 @@ int main() {
         glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        auto location = glGetUniformLocation(model_shader.ID, "texture_diffuse0");
+        glUniform1i(location, 0);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
         glDepthFunc(GL_LESS);
@@ -236,17 +242,20 @@ int main() {
         model_shader.SetVector3f("viewPos", camera.Position);
         model_shader.SetVector3f("lightColor", glm::vec3(1, 1, 1));
         model_shader.SetVector3f("lightPos", glm::vec3(lightValue[0], lightValue[1], lightValue[2]));
-        model_shader.SetFloat("ambientStrength", 0.1f);
-        model_shader.SetFloat("shininess", 4.0f);
+        model_shader.SetFloat("ambientStrength", 0.5f);
+        model_shader.SetFloat("shininess", 8.0f);
         model_shader.SetFloat("diffuseFactor", 0.8f);
-        model_shader.SetFloat("specularStrength", 0.3f);
+        model_shader.SetFloat("specularStrength", 0.2f);
         model_shader.SetInteger("diffuseTexture", 0);
         model_shader.SetInteger("shadowMap", 1);
         model_shader.SetInteger("type", 0);
         model_shader.SetVector3f("sprite_color", glm::vec3(1, 1, 1));
+        model_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, shadow.depthMap);
+        location = glGetUniformLocation(model_shader.ID, "shadowMap");
+        glUniform1i(location, 2);
 
 
         world.drawScene(model_shader);
