@@ -206,6 +206,7 @@ int main() {
         auto prevViewport = shadow.bind();
         shadow.shadowShader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
+
         //Draw scene from light's perspective
         world.drawScene(shadow.shadowShader);
         world.drawObject(shadow.shadowShader);
@@ -257,7 +258,6 @@ int main() {
         location = glGetUniformLocation(model_shader.ID, "shadowMap");
         glUniform1i(location, 2);
 
-
         world.drawScene(model_shader);
         world.drawObject(model_shader);
 
@@ -267,15 +267,16 @@ int main() {
         drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
 
 
-        render.RenderText("Enjoy-The-Beach", header,
-                          1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-
 		if (scene_mode == 1) {
 			glm::mat4 model(1.0f);
 			projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 500.f);
 			// Render snow
 			snow.Render(deltaTime, model, view, projection);
 		}
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		render.RenderText("Enjoy-The-Beach", header,
+			1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 
         // render
         ImGui::Render();
