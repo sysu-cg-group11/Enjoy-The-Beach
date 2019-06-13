@@ -23,6 +23,11 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
+#include "particle_system.h"
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 void drawModel(Shader &model_shader, Model &model, glm::vec3 position, glm::vec3 size = glm::vec3(1.0f),
@@ -49,6 +54,7 @@ float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { 40.0, 60.0, 50.0 };
 // Head themes location
 glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
 
+int scene_mode = 0;
 
 int main() {
     // glfw: initialize and configure
@@ -62,55 +68,57 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
 #endif
 
-    // glfw window creation
-    // --------------------
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Enjoy The Beach", NULL, NULL);
-    if (window == NULL) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetScrollCallback(window, scroll_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+														 // glfw window creation
+														 // --------------------
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Enjoy The Beach", NULL, NULL);
+	if (window == NULL)
+	{
+		std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+	// glad: load all OpenGL function pointers
+	// ---------------------------------------
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
 
-    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-    glEnable(GL_DEPTH_TEST);
+	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	glEnable(GL_DEPTH_TEST);
 
-    //setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void) io;
-    //style
-    ImGui::StyleColorsClassic();
-    //binding
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
+	//setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//style
+	ImGui::StyleColorsClassic();
+	//binding
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Init shaders
-    Shader shader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
-    Shader model_shader("../src/shaders/model_shader.vs", "../src/shaders/model_shader.fs");
-    Shader font_shader("../src/shaders/font_shader.vs", "../src/shaders/font_shader.fs");
+	// Init shaders
+	Shader shader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
+	Shader model_shader("../src/shaders/model_shader.vs", "../src/shaders/model_shader.fs");
+	Shader font_shader("../src/shaders/font_shader.vs", "../src/shaders/font_shader.fs");
+	
 
+	// Set font infos
+	font_shader.SetMatrix4("projection", glm::ortho(0.0f, (float)SCR_WIDTH, 0.0f, (float)SCR_HEIGHT), true);
+	// Create font renderer
+	FontRender render(&font_shader, "../resources/Font/TimesNewRoman.ttf");
+	
+	Snow snow;
 
-    // Set font infos
-    font_shader.SetMatrix4("projection", glm::ortho(0.0f, (float) SCR_WIDTH, 0.0f, (float) SCR_HEIGHT), true);
-    // Create font renderer
-    FontRender render(&font_shader, "../resources/Font/TimesNewRoman.ttf");
-
-
-    glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
 
@@ -253,6 +261,13 @@ int main() {
         render.RenderText("Enjoy-The-Beach", header,
                           1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 
+		if (scene_mode == 1) {
+			glm::mat4 model(1.0f);
+			projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 500.f);
+			// Render snow
+			snow.Render(deltaTime, model, view, projection);
+		}
+
         // render
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -291,23 +306,28 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 }
 
 // process all input
-void processInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+void processInput(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    static bool lightPressed = false;
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.ProcessKeyboard(FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.ProcessKeyboard(LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		scene_mode = 0;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		scene_mode = 1 ;
+	static bool lightPressed = false;
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
         lightPressed = true;
     }
-    if (lightPressed && glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE) {
+    if (lightPressed && glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE) {
         lightValue[0] = -lightValue[0];
         lightValue[2] = -lightValue[2];
         lightPressed = false;
