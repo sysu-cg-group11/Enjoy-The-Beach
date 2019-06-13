@@ -39,7 +39,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // View position and light position
-float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { 0.0, 100.0, 0.0 };
+float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { 0.0, 50.0, 0.0 };
 
 // Head themes location
 glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
@@ -141,7 +141,7 @@ int main()
 	shader.SetInteger("skybox", 0);
 
 	// Load all .obj models
-
+	Model sun("../resources/sun/Sun_01.obj");
 	Model beach("../resources/beach/model.obj");
 	Model seagull("../resources/seagull/Flying gull Texture 2.obj");
 
@@ -215,9 +215,10 @@ int main()
         world->drawScene(model_shader);
         world->drawObject(model_shader);
 
-		drawModel(model_shader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(5.0f));
-        drawModel(model_shader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
-        drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+		drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
+		drawModel(model_shader, beach, glm::vec3(20.0f, 2.0f, 20.0f), glm::vec3(5.0f));
+        drawModel(model_shader, seagull, glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.02f));
+        drawModel(model_shader, seagull, glm::vec3(3.0f, 9.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
 
 		shader.Use();
 		// skybox cube
