@@ -16,6 +16,8 @@
 #include "world_render.h"
 #include "model.h"
 
+#include "particle_system.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -44,6 +46,7 @@ float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { 0.0, 50.0, 0.0 };
 // Head themes location
 glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
 
+int scene_mode = 0;
 
 int main()
 {
@@ -106,6 +109,7 @@ int main()
 	// Create font renderer
 	FontRender render(&font_shader, "../resources/Font/TimesNewRoman.ttf");
 	
+	Snow snow;
 
 	glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -149,6 +153,8 @@ int main()
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	// render loop
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -170,6 +176,7 @@ int main()
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 
+		glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
 		glDepthFunc(GL_LEQUAL);
 		shader.Use();
 
@@ -188,11 +195,12 @@ int main()
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS);
 
+		view = camera.GetViewMatrix();
+
 		// Draw all imported models
-		
+
 		model_shader.Use();
 
-		view = camera.GetViewMatrix();
 		model_shader.SetMatrix4("view", view);
 		model_shader.SetMatrix4("projection", projection);
 		model_shader.SetVector3f("viewPos", camera.Position);
@@ -231,6 +239,13 @@ int main()
 
 		render.RenderText("Enjoy-The-Beach", header,
 			1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+
+		if (scene_mode == 1) {
+			glm::mat4 model(1.0f);
+			projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 500.f);
+			// Render snow
+			snow.Render(deltaTime, model, view, projection);
+		}
 
 		// render
 		ImGui::Render();
@@ -286,6 +301,10 @@ void processInput(GLFWwindow *window)
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		scene_mode = 0;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		scene_mode = 1 ;
 }
 
 //window size changed
