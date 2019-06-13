@@ -8,6 +8,7 @@
 
 class WorldRender {
 public:
+    WorldRender(const WorldRender &ano) = delete;
 
     WorldRender() {
         this->renderer = new CubeRender;
@@ -19,9 +20,9 @@ public:
         delete this->renderer;
     }
 
-    static WorldRender *getInstance() {
+    static WorldRender &getInstance() {
         static WorldRender renderer;
-        return &renderer;
+        return renderer;
     }
 
 

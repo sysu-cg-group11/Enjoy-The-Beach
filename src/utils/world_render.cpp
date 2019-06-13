@@ -34,6 +34,7 @@ void WorldRender::DrawTree(CubeRender::BlockType tree_type, CubeRender::BlockTyp
     SingleRender(shader, count, leaves, leave_type);
 }
 
+//Objects will be used in shadow map
 void WorldRender::drawObject(Shader &shader) {
     DrawTree(renderer->TREE_OAK, renderer->LEAVE_OAK, glm::vec3(-15.0f, 1.0f, 12.0f), shader);
 	DrawTree(renderer->TREE_BIRCH, renderer->LEAVE_BIRCH, glm::vec3(15.0f, 1.0f, 12.0f), shader);
@@ -56,15 +57,15 @@ void WorldRender::drawScene(Shader &shader) {
     SingleRender(shader, sand_count, sand_position, renderer->SAND);
 
     // Render Water
-	glm::vec3 water_position[6400];
-	int water_count = 6400;
-	index = 0;
-	for (int i = -40; i < 40; i++) {
-		for (int j = -40; j < 40; j++) {
-			glm::vec3 pos = glm::vec3((float)i, 0.0f, (float)j);
-			water_position[index++] = pos;
-		}
-	}
+    glm::vec3 water_position[6400];
+    int water_count = 6400;
+    index = 0;
+    for (int i = -40; i < 40; i++) {
+        for (int j = -40; j < 40; j++) {
+            glm::vec3 pos = glm::vec3((float) i, 0.0f, (float) j);
+            water_position[index++] = pos;
+        }
+    }
 
 
     SingleRender(shader, water_count, water_position, renderer->WATER);

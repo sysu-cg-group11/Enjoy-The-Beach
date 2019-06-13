@@ -3,14 +3,28 @@
 
 
 #include <glad/glad.h>
+#include "shader.h"
+#include <array>
 
 class Shadow {
 public:
-    Shadow();
+    static Shadow &getInstance();
 
+    Shader shadowShader;
+    GLuint depthMap;
+    GLuint height = 2048, width = 2048;
+
+    Shadow(const Shadow &ano) = delete;
+
+    std::array<GLint, 4> bind();
+
+    void unbind(const std::array<GLint, 4> &prevViewPort);
 
 private:
-    GLuint height, width;
+
+    GLuint depthMapFBO;
+
+    Shadow();
 };
 
 
