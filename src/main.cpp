@@ -183,7 +183,6 @@ int main() {
 
         glDepthFunc(GL_LEQUAL);
 
-
         glm::mat3 temp(camera.GetViewMatrix());
         glm::mat4 view = glm::mat4(temp);
 
@@ -204,6 +203,8 @@ int main() {
         auto &shadow = Shadow::getInstance();
         auto prevViewport = shadow.bind();
         shadow.shadowShader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
 
         //Draw scene from light's perspective
         drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
@@ -236,10 +237,10 @@ int main() {
         model_shader.SetVector3f("viewPos", camera.Position);
         model_shader.SetVector3f("lightColor", glm::vec3(1, 1, 1));
         model_shader.SetVector3f("lightPos", glm::vec3(lightValue[0], lightValue[1], lightValue[2]));
-        model_shader.SetFloat("ambientStrength", 0.1f);
-        model_shader.SetFloat("shininess", 4.0f);
+        model_shader.SetFloat("ambientStrength", 0.5f);
+        model_shader.SetFloat("shininess", 5.0f);
         model_shader.SetFloat("diffuseFactor", 0.8f);
-        model_shader.SetFloat("specularStrength", 0.3f);
+        model_shader.SetFloat("specularStrength", 0.2f);
         model_shader.SetInteger("diffuseTexture", 0);
         model_shader.SetInteger("shadowMap", 1);
         model_shader.SetInteger("type", 0);
@@ -247,7 +248,6 @@ int main() {
 
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, shadow.depthMap);
-
 
         world.drawScene(model_shader);
         world.drawObject(model_shader);
@@ -258,15 +258,16 @@ int main() {
         drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
 
 
-        render.RenderText("Enjoy-The-Beach", header,
-                          1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-
 		if (scene_mode == 1) {
 			glm::mat4 model(1.0f);
 			projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 500.f);
 			// Render snow
 			snow.Render(deltaTime, model, view, projection);
 		}
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		render.RenderText("Enjoy-The-Beach", header,
+			1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 
         // render
         ImGui::Render();
