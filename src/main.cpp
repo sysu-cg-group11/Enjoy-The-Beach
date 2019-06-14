@@ -155,6 +155,12 @@ int main() {
 	Model sun("../resources/sun/Sun_01.obj");
     Model beach("../resources/beach/model.obj");
     Model seagull("../resources/seagull/Flying gull Texture 2.obj");
+    Model chair1("../resources/chair1/Beach Chair .obj");
+	Model chair2("../resources/chair2/Beach Chairs and Umbrella.obj");
+	Model umbrella1("../resources/umbrella1/model.obj");
+	Model umbrella2("../resources/umbrella2/model.obj");
+	Model umbrella3("../resources/umbrella3/model.obj");
+	Model seashell("../resources/seashell/seaShell2.obj");
 
     auto &world = WorldRender::getInstance();
 
@@ -215,6 +221,19 @@ int main() {
         drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(5.0f));
         drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
         drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+        
+        drawModel(shadow.shadowShader, chair1, glm::vec3(7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+		drawModel(shadow.shadowShader, chair1, glm::vec3(0.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+		drawModel(shadow.shadowShader, chair1, glm::vec3(-7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+
+		drawModel(shadow.shadowShader, chair2, glm::vec3(-5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+		drawModel(shadow.shadowShader, chair2, glm::vec3(5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 60.0f, 0.0f));
+
+		drawModel(shadow.shadowShader, umbrella1, glm::vec3(5.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+		drawModel(shadow.shadowShader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+		drawModel(shadow.shadowShader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+
+		drawModel(shadow.shadowShader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
 
 
         shadow.unbind(prevViewport);
@@ -265,6 +284,19 @@ int main() {
         drawModel(model_shader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(5.0f));
         drawModel(model_shader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
         drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+        
+        drawModel(model_shader, chair1, glm::vec3(7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+		drawModel(model_shader, chair1, glm::vec3(0.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+		drawModel(model_shader, chair1, glm::vec3(-7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+
+		drawModel(model_shader, chair2, glm::vec3(-5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+		drawModel(model_shader, chair2, glm::vec3(5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 60.0f, 0.0f));
+
+		drawModel(model_shader, umbrella1, glm::vec3(5.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+		drawModel(model_shader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+		drawModel(model_shader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+
+		drawModel(model_shader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
 
 
 		if (scene_mode == 1) {
