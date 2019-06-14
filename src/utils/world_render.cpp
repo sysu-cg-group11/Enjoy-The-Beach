@@ -44,6 +44,7 @@ void WorldRender::drawObject(Shader &shader) {
 
 void WorldRender::drawScene(Shader &shader) {
     // Draw Sands
+	
     int sand_count = 1600, index = 0;
     glm::vec3 sand_position[1600];
 
@@ -55,6 +56,7 @@ void WorldRender::drawScene(Shader &shader) {
     }
 
     SingleRender(shader, sand_count, sand_position, renderer->SAND);
+	
 
     // Render Water
     glm::vec3 water_position[6400];
@@ -69,4 +71,5 @@ void WorldRender::drawScene(Shader &shader) {
 
 
     SingleRender(shader, water_count, water_position, renderer->WATER);
+	
 }

@@ -31,7 +31,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 void drawModel(Shader &model_shader, Model &model, glm::vec3 position, glm::vec3 size = glm::vec3(1.0f),
-               glm::vec3 rotate = glm::vec3(0.0f));
+               glm::vec3 rotate = glm::vec3(0.0f), glm::vec3 rotate2 = glm::vec3(0.0f));
+
+void checkCollision();
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
@@ -49,12 +51,45 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // View position and light position
-float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { 40.0, 60.0, 50.0 };
+float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { -12.0f, 15.0f, -12.0f };
 
 // Head themes location
 glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
 
 int scene_mode = 0;
+int snowman_frame = 0.0f, dir = 1.0f;
+// Set player location
+glm::vec3 player_pos(0.0f);
+glm::vec3 player_angle(0.0f);
+
+int have_snowman = 0, have_penguin = 0, current_cold_index = 0, current_hot_index = 0;
+int have_fire = 0, have_cactus = 0;
+float current_z = 0.0f;
+bool stage_mode = true;
+unsigned int cubemapTexture;
+
+vector<glm::vec2> snow_elements_pos;
+vector<glm::vec3> fire_elements_pos;
+
+std::vector<std::string> hot_faces
+{
+	"../resources/textures/skybox/sky-hot.jpg",
+	"../resources/textures/skybox/sky-hot.jpg",
+	"../resources/textures/skybox/hot-top.jpg",
+	"../resources/textures/skybox/hot-bottom.jpg",
+	"../resources/textures/skybox/sky-hot.jpg",
+	"../resources/textures/skybox/sky-hot.jpg"
+};
+
+std::vector<std::string> cold_faces
+{
+	"../resources/textures/skybox/sky-cold.jpg",
+	"../resources/textures/skybox/sky-cold.jpg",
+	"../resources/textures/skybox/cold-top.jpg",
+	"../resources/textures/skybox/cold-bottom.jpg",
+	"../resources/textures/skybox/sky-cold.jpg",
+	"../resources/textures/skybox/sky-cold.jpg"
+};
 
 int main() {
     // glfw: initialize and configure
@@ -122,9 +157,6 @@ int main() {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
 
-
-
-
     // build and compile our shader program
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // skybox VAO
@@ -137,32 +169,46 @@ int main() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
 
-    std::vector<std::string> faces
-            {
-                    "../resources/textures/skybox/right.jpg",
-                    "../resources/textures/skybox/left.jpg",
-                    "../resources/textures/skybox/top.jpg",
-                    "../resources/textures/skybox/bottom.jpg",
-                    "../resources/textures/skybox/back.jpg",
-                    "../resources/textures/skybox/front.jpg"
-            };
+	if (stage_mode) {
+		cubemapTexture = CubeRender::loadCubemap(cold_faces);
+	}
+	else {
+		cubemapTexture = CubeRender::loadCubemap(hot_faces);
+	}
 
-    unsigned int cubemapTexture = CubeRender::loadCubemap(faces);
     shader.Use();
     shader.SetInteger("skybox", 0);
 
     // Load all .obj models
 	Model sun("../resources/sun/Sun_01.obj");
     Model beach("../resources/beach/model.obj");
+	Model player("../resources/birds/bird2/NOVELO_PARROT.obj");
     Model seagull("../resources/seagull/Flying gull Texture 2.obj");
+	Model snowMan("../resources/snowman/model.obj");
     Model chair1("../resources/chair1/Beach Chair .obj");
-	Model chair2("../resources/chair2/Beach Chairs and Umbrella.obj");
-	Model umbrella1("../resources/umbrella1/model.obj");
-	Model umbrella2("../resources/umbrella2/model.obj");
-	Model umbrella3("../resources/umbrella3/model.obj");
-	Model seashell("../resources/seashell/seaShell2.obj");
+    Model chair2("../resources/chair2/Beach Chairs and Umbrella.obj");
+    Model umbrella1("../resources/umbrella1/model.obj");
+    Model umbrella2("../resources/umbrella2/model.obj");
+    Model umbrella3("../resources/umbrella3/model.obj");
+    Model seashell("../resources/seashell/seaShell2.obj");
+	Model penguin("../resources/penguin/Mesh_Penguin.obj");
+
+	// Winter Models
+	Model snowMountain("../resources/mountain/WinterScene.obj");
+	Model fire("../resources/fires/PUSHILIN_campfire.obj");
+	Model cactus("../resources/fires/PUSHILIN_cactus.obj");
 
     auto &world = WorldRender::getInstance();
+
+	snow_elements_pos.push_back(glm::vec2(10.0f, 10.0f));
+	snow_elements_pos.push_back(glm::vec2(-10.0f, 10.0f));
+	snow_elements_pos.push_back(glm::vec2(10.0f, -10.0f));
+	snow_elements_pos.push_back(glm::vec2(-10.0f, -10.0f));
+
+	fire_elements_pos.push_back(glm::vec3(50.0f, 10.0f, 0.0f));
+	fire_elements_pos.push_back(glm::vec3(9.0f, 10.0f, 9.0f));
+	fire_elements_pos.push_back(glm::vec3(8.0f, 10.0f, 8.0f));
+	fire_elements_pos.push_back(glm::vec3(7.0f, 10.0f, 7.0f));
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // render loop
@@ -171,8 +217,17 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+		if (snowman_frame == 100)
+			dir = -1.0f;
+		else if (snowman_frame == 0)
+			dir = 1.0f;
+
+		snowman_frame += dir;
+		current_z = snowman_frame * 0.02f + 1.0f;
+
         // input
         processInput(window);
+		checkCollision();
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -197,61 +252,76 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,
                                                 500.0f);
 
-
         GLfloat near_plane = 1.0f, far_plane = 10.0f;
-        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-        glm::mat4 lightView = glm::lookAt(glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.0f),
-                                          glm::vec3(0.0, 1.0, 0.0));
-        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-        model_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
-
-        // Draw all imported models
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        glm::mat4 lightView = glm::lookAt(glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.0f),glm::vec3(0.0, 1.0, 0.0));
+		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+        //model_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
         //Shadow map
         auto &shadow = Shadow::getInstance();
         auto prevViewport = shadow.bind();
         shadow.shadowShader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
+		if (!stage_mode) {
+			//Draw scene from light's perspective
+			world.drawScene(shadow.shadowShader);
+			world.drawObject(shadow.shadowShader);
 
-        //Draw scene from light's perspective
-        world.drawScene(shadow.shadowShader);
-        world.drawObject(shadow.shadowShader);
+			drawModel(shadow.shadowShader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
+			drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
+			drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
+			//drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
+			drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+			if (have_snowman < 2) {
+				drawModel(shadow.shadowShader, snowMan, glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.0f, snow_elements_pos[have_snowman].y), glm::vec3(1.0f));
+			}
+			else if (have_penguin < 2) {
+				drawModel(shadow.shadowShader, penguin, glm::vec3(snow_elements_pos[have_penguin + 2].x, snowman_frame * 0.02f + 1.0f, snow_elements_pos[have_penguin + 2].y), glm::vec3(0.01f));
+			}
 
-        drawModel(shadow.shadowShader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
-        drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(5.0f));
-        drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
-        drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+
+			drawModel(shadow.shadowShader, chair1, glm::vec3(7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+			drawModel(shadow.shadowShader, chair1, glm::vec3(0.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+			drawModel(shadow.shadowShader, chair1, glm::vec3(-7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+
+			drawModel(shadow.shadowShader, chair2, glm::vec3(-5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+			drawModel(shadow.shadowShader, chair2, glm::vec3(5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 60.0f, 0.0f));
+
+			drawModel(shadow.shadowShader, umbrella1, glm::vec3(5.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+			drawModel(shadow.shadowShader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+			drawModel(shadow.shadowShader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+
+			drawModel(shadow.shadowShader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
+		}
+		else {
+			drawModel(shadow.shadowShader, snowMountain, glm::vec3(0.0f), glm::vec3(10.0f));
+
+			if (have_fire < 2) {
+				drawModel(shadow.shadowShader, fire, glm::vec3(fire_elements_pos[have_fire].x, fire_elements_pos[have_fire].y, fire_elements_pos[have_fire].z), glm::vec3(2.0f));
+			}
+			else if (have_cactus < 2) {
+				drawModel(shadow.shadowShader, cactus, glm::vec3(fire_elements_pos[have_cactus + 2].x, fire_elements_pos[have_cactus + 2].y, fire_elements_pos[have_cactus + 2].z), glm::vec3(2.0f));
+			}
+		}
         
-        drawModel(shadow.shadowShader, chair1, glm::vec3(7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
-		drawModel(shadow.shadowShader, chair1, glm::vec3(0.0f, 2.0f, 15.0f), glm::vec3(0.02f));
-		drawModel(shadow.shadowShader, chair1, glm::vec3(-7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
-
-		drawModel(shadow.shadowShader, chair2, glm::vec3(-5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
-		drawModel(shadow.shadowShader, chair2, glm::vec3(5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 60.0f, 0.0f));
-
-		drawModel(shadow.shadowShader, umbrella1, glm::vec3(5.0f, 3.2f, 13.0f), glm::vec3(10.0f));
-		drawModel(shadow.shadowShader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
-		drawModel(shadow.shadowShader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
-
-		drawModel(shadow.shadowShader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
-
 
         shadow.unbind(prevViewport);
 
-        //Render scene
-        //Sky-box
-        shader.Use();
-        shader.SetMatrix4("view", view);
-        shader.SetMatrix4("projection", projection);
+		//Render scene
+		//Sky-box
+		view = glm::mat4(temp);
+		shader.Use();
+		shader.SetMatrix4("view", view);
+		shader.SetMatrix4("projection", projection);
 
-        glBindVertexArray(skyboxVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        auto location = glGetUniformLocation(model_shader.ID, "texture_diffuse0");
-        glUniform1i(location, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-        glDepthFunc(GL_LESS);
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS);
 
         // Objects
         model_shader.Use();
@@ -267,37 +337,53 @@ int main() {
         model_shader.SetFloat("diffuseFactor", 0.8f);
         model_shader.SetFloat("specularStrength", 0.2f);
         model_shader.SetInteger("diffuseTexture", 0);
-        model_shader.SetInteger("shadowMap", 1);
         model_shader.SetInteger("type", 0);
         model_shader.SetVector3f("sprite_color", glm::vec3(1, 1, 1));
         model_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
-        glActiveTexture(GL_TEXTURE2);
+		model_shader.SetInteger("shadowMap", 3);
+        glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, shadow.depthMap);
-        location = glGetUniformLocation(model_shader.ID, "shadowMap");
-        glUniform1i(location, 2);
 
-        world.drawScene(model_shader);
-        world.drawObject(model_shader);
+		if (!stage_mode) {
+			world.drawScene(model_shader);
+			world.drawObject(model_shader);
 
-		drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
-        drawModel(model_shader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(5.0f));
-        drawModel(model_shader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
-        drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
-        
-        drawModel(model_shader, chair1, glm::vec3(7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
-		drawModel(model_shader, chair1, glm::vec3(0.0f, 2.0f, 15.0f), glm::vec3(0.02f));
-		drawModel(model_shader, chair1, glm::vec3(-7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+			drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
+			drawModel(model_shader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
+			drawModel(model_shader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
+			//drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
+			drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+			if (have_snowman < 2) {
+				drawModel(model_shader, snowMan, glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.0f, snow_elements_pos[have_snowman].y), glm::vec3(1.0f));
+			}
+			else if (have_penguin < 2) {
+				drawModel(model_shader, penguin, glm::vec3(snow_elements_pos[have_penguin + 2].x, snowman_frame * 0.02f + 1.0f, snow_elements_pos[have_penguin + 2].y), glm::vec3(0.01f));
+			}
 
-		drawModel(model_shader, chair2, glm::vec3(-5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
-		drawModel(model_shader, chair2, glm::vec3(5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 60.0f, 0.0f));
+			drawModel(model_shader, chair1, glm::vec3(7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+			drawModel(model_shader, chair1, glm::vec3(0.0f, 2.0f, 15.0f), glm::vec3(0.02f));
+			drawModel(model_shader, chair1, glm::vec3(-7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
 
-		drawModel(model_shader, umbrella1, glm::vec3(5.0f, 3.2f, 13.0f), glm::vec3(10.0f));
-		drawModel(model_shader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
-		drawModel(model_shader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+			drawModel(model_shader, chair2, glm::vec3(-5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
+			drawModel(model_shader, chair2, glm::vec3(5.0f, 4.8f, -14.0f), glm::vec3(0.02f), glm::vec3(0.0f, 60.0f, 0.0f));
 
-		drawModel(model_shader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
+			drawModel(model_shader, umbrella1, glm::vec3(5.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+			drawModel(model_shader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
+			drawModel(model_shader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
 
+			drawModel(model_shader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
+		}
+		else {
+			drawModel(model_shader, snowMountain, glm::vec3(0.0f), glm::vec3(10.0f));
+
+			if (have_fire < 2) {
+				drawModel(model_shader, fire, glm::vec3(fire_elements_pos[have_fire].x, fire_elements_pos[have_fire].y, fire_elements_pos[have_fire].z), glm::vec3(2.0f));
+			}
+			else if (have_cactus < 2) {
+				drawModel(model_shader, cactus, glm::vec3(fire_elements_pos[have_cactus + 2].x, fire_elements_pos[have_cactus + 2].y, fire_elements_pos[have_cactus + 2].z), glm::vec3(2.0f));
+			}
+		}
 
 		if (scene_mode == 1) {
 			glm::mat4 model(1.0f);
@@ -341,6 +427,11 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     lastY = ypos;
 
     camera.ProcessMouseMovement(xoffset, yoffset);
+
+	player_pos = glm::vec3(camera.Position.x + 10 * camera.Front.x,
+		camera.Position.y + 10 * camera.Front.y,
+		camera.Position.z + 10 * camera.Front.z);
+	//player_angle = glm::vec3(camera.Pitch, -90 - camera.Yaw, 0.0f);
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
@@ -374,6 +465,15 @@ void processInput(GLFWwindow *window)
         lightValue[2] = -lightValue[2];
         lightPressed = false;
     }
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ||
+		glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		player_pos = glm::vec3(camera.Position.x + 10 * camera.Front.x,
+			camera.Position.y + 10 * camera.Front.y,
+			camera.Position.z + 10 * camera.Front.z);
+	}
+	
 }
 
 //window size changed
@@ -382,16 +482,68 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 
-void drawModel(Shader &model_shader, Model &modelObj, glm::vec3 position, glm::vec3 size, glm::vec3 rotate) {
+void drawModel(Shader &model_shader, Model &modelObj, glm::vec3 position, glm::vec3 size, glm::vec3 rotate, glm::vec3 rotate2) {
     model_shader.Use();
 
     glm::mat4 model(1.0f);
     model = glm::translate(model, position);
     model = glm::scale(model, size);
+	model = glm::rotate(model, rotate2.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, rotate2.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, rotate2.x, glm::vec3(1.0f, 0.0f, 0.0f));
+
     model = glm::rotate(model, rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
+	
     model_shader.SetMatrix4("model", model);
     modelObj.Draw(&model_shader);
+}
+
+void checkCollision() {
+	int border_box = 1.0f;
+	// Check beach objects collision
+	if ((camera.Position.x >= snow_elements_pos[current_hot_index].x - border_box && camera.Position.x <= snow_elements_pos[current_hot_index].x + border_box) &&
+		(camera.Position.y >= current_z - border_box && camera.Position.y <= current_z + border_box) &&
+		(camera.Position.z >= snow_elements_pos[current_hot_index].y - border_box && camera.Position.z <= snow_elements_pos[current_hot_index].y + border_box)) {
+		// Collision
+		if (current_hot_index < 2) {
+			have_snowman += 1;
+			current_hot_index += 1;
+		}
+		else if (current_hot_index < 4) {
+			have_penguin += 1;
+			current_hot_index += 1;
+		}
+		if(current_hot_index == 4) {
+			// Set jump into snow mountains
+			stage_mode = true;
+			current_hot_index = 0;
+			have_penguin = 0;
+			have_snowman = 0;
+			cubemapTexture = CubeRender::loadCubemap(cold_faces);
+		}
+	}
+	// Check mountain objects collision
+	if ((camera.Position.x >= fire_elements_pos[current_cold_index].x - border_box && camera.Position.x <= fire_elements_pos[current_cold_index].x + border_box) &&
+		(camera.Position.z >= fire_elements_pos[current_cold_index].z - border_box && camera.Position.z <= fire_elements_pos[current_cold_index].z + border_box) &&
+		(camera.Position.y >= fire_elements_pos[current_cold_index].y - border_box && camera.Position.y <= fire_elements_pos[current_cold_index].y + border_box)) {
+		// Collision
+		if (current_cold_index < 2) {
+			have_fire += 1;
+			current_cold_index += 1;
+		}
+		else if (current_cold_index < 4) {
+			have_cactus += 1;
+			current_cold_index += 1;
+		}
+		if (current_cold_index == 4) {
+			// Set jump into snow mountains
+			stage_mode = false;
+			current_cold_index = 0;
+			have_fire = 0;
+			have_cactus = 0;
+			cubemapTexture = CubeRender::loadCubemap(hot_faces);
+		}
+	}
 }
