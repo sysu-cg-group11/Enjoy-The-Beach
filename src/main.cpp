@@ -245,12 +245,12 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-		/*
+
         ImGui::Begin("Beach\n");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                     ImGui::GetIO().Framerate);
         ImGui::End();
-		*/
+
 
         glDepthFunc(GL_LEQUAL);
 
@@ -262,7 +262,7 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,
                                                 500.0f);
 
-        GLfloat near_plane = 1.0f, far_plane = 10.0f;
+        GLfloat near_plane = 1.0f, far_plane = 30.0f;
 		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         glm::mat4 lightView = glm::lookAt(glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.0f),glm::vec3(0.0, 1.0, 0.0));
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
@@ -359,10 +359,10 @@ int main() {
         model_shader.SetVector3f("viewPos", camera.Position);
         model_shader.SetVector3f("lightColor", glm::vec3(1, 1, 1));
         model_shader.SetVector3f("lightPos", glm::vec3(lightValue[0], lightValue[1], lightValue[2]));
-        model_shader.SetFloat("ambientStrength", 0.5f);
+        model_shader.SetFloat("ambientStrength", 0.45f);
         model_shader.SetFloat("shininess", 8.0f);
-        model_shader.SetFloat("diffuseFactor", 0.8f);
-        model_shader.SetFloat("specularStrength", 0.2f);
+        model_shader.SetFloat("diffuseFactor", 0.9f);
+        model_shader.SetFloat("specularStrength", 0.5f);
         model_shader.SetInteger("diffuseTexture", 0);
         model_shader.SetInteger("type", 0);
         model_shader.SetVector3f("sprite_color", glm::vec3(1, 1, 1));
