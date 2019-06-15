@@ -192,6 +192,7 @@ int main() {
     Model umbrella3("../resources/umbrella3/model.obj");
     Model seashell("../resources/seashell/seaShell2.obj");
 	Model penguin("../resources/penguin/Mesh_Penguin.obj");
+	Model volcano("../resources/volcano/Volcano.obj");
 
 	// Winter Models
 	Model snowMountain("../resources/mountain/WinterScene.obj");
@@ -237,10 +238,12 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+		/*
         ImGui::Begin("Beach\n");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                     ImGui::GetIO().Framerate);
         ImGui::End();
+		*/
 
         glDepthFunc(GL_LEQUAL);
 
@@ -263,15 +266,16 @@ int main() {
         auto prevViewport = shadow.bind();
         shadow.shadowShader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
+		drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
+
 		if (!stage_mode) {
 			//Draw scene from light's perspective
 			world.drawScene(shadow.shadowShader);
 			world.drawObject(shadow.shadowShader);
-
+			//drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(285.0f, 0.0f, 182.0f), player_angle);
 			drawModel(shadow.shadowShader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
 			drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
 			drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
-			//drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
 			drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
 			if (have_snowman < 2) {
 				drawModel(shadow.shadowShader, snowMan, glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.2f, snow_elements_pos[have_snowman].y), glm::vec3(1.0f));
@@ -293,8 +297,11 @@ int main() {
 			drawModel(shadow.shadowShader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
 
 			drawModel(shadow.shadowShader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
+
+			drawModel(shadow.shadowShader, volcano, glm::vec3(-25.0f, 1.0f, -25.0f), glm::vec3(1.0f));
 		}
 		else {
+			//drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
 			drawModel(shadow.shadowShader, snowMountain, glm::vec3(0.0f), glm::vec3(10.0f));
 
 			if (have_fire < 2) {
@@ -348,11 +355,10 @@ int main() {
 		if (!stage_mode) {
 			world.drawScene(model_shader);
 			world.drawObject(model_shader);
-
+			//drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(285.0f, 0.0f, 182.0f), player_angle);
 			drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
 			drawModel(model_shader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
 			drawModel(model_shader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
-			//drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
 			drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
 			if (have_snowman < 2) {
 				drawModel(model_shader, snowMan, glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.2f, snow_elements_pos[have_snowman].y), glm::vec3(1.0f));
@@ -373,8 +379,11 @@ int main() {
 			drawModel(model_shader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
 
 			drawModel(model_shader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
+
+			drawModel(model_shader, volcano, glm::vec3(-25.0f, 1.0f, -25.0f), glm::vec3(1.0f));
 		}
 		else {
+			//drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
 			drawModel(model_shader, snowMountain, glm::vec3(0.0f), glm::vec3(10.0f));
 
 			if (have_fire < 2) {
@@ -443,10 +452,10 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 
     camera.ProcessMouseMovement(xoffset, yoffset);
 
-	player_pos = glm::vec3(camera.Position.x + 10 * camera.Front.x,
-		camera.Position.y + 10 * camera.Front.y,
-		camera.Position.z + 10 * camera.Front.z);
-	//player_angle = glm::vec3(camera.Pitch, -90 - camera.Yaw, 0.0f);
+	player_pos = glm::vec3(camera.Position.x + 8 * camera.Front.x,
+		camera.Position.y + 8 * camera.Front.y,
+		camera.Position.z + 8 * camera.Front.z);
+	player_angle = glm::vec3(camera.Pitch, -90 - camera.Yaw, 0.0f);
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
@@ -484,9 +493,9 @@ void processInput(GLFWwindow *window)
 		glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ||
 		glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ||
 		glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		player_pos = glm::vec3(camera.Position.x + 10 * camera.Front.x,
-			camera.Position.y + 10 * camera.Front.y,
-			camera.Position.z + 10 * camera.Front.z);
+		player_pos = glm::vec3(camera.Position.x + 8 * camera.Front.x,
+			camera.Position.y + 8 * camera.Front.y,
+			camera.Position.z + 8 * camera.Front.z);
 	}
 	
 }
@@ -502,7 +511,6 @@ void drawModel(Shader &model_shader, Model &modelObj, glm::vec3 position, glm::v
 
     glm::mat4 model(1.0f);
     model = glm::translate(model, position);
-    model = glm::scale(model, size);
 	model = glm::rotate(model, rotate2.z, glm::vec3(0.0f, 0.0f, 1.0f));
 	model = glm::rotate(model, rotate2.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, rotate2.x, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -511,6 +519,7 @@ void drawModel(Shader &model_shader, Model &modelObj, glm::vec3 position, glm::v
     model = glm::rotate(model, rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));
 	
+	model = glm::scale(model, size);
     model_shader.SetMatrix4("model", model);
     modelObj.Draw(&model_shader);
 }
