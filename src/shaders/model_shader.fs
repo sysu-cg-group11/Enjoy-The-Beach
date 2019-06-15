@@ -30,7 +30,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
     float currentDepth = projCoords.z;
 
     float bias = max(0.5 * (1.0 - dot(normal, lightDir)), 0.005);
@@ -81,6 +81,7 @@ void main()
         FragColor = vec4(lighting, 1.0);
     }
     else {
+
         vec3 result = (ambient + (1.0 - shadow) * (diffuse + specular)) * sprite_color;
         if(type == 1) {
             FragColor = vec4(result, 1.0);
