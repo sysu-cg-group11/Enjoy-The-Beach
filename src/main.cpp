@@ -65,7 +65,7 @@ glm::vec3 player_angle(0.0f);
 int have_snowman = 0, have_penguin = 0, current_cold_index = 0, current_hot_index = 0;
 int have_fire = 0, have_cactus = 0;
 float current_z = 0.0f;
-bool stage_mode = true;
+bool stage_mode = false;
 unsigned int cubemapTexture;
 
 vector<glm::vec2> snow_elements_pos;
@@ -201,14 +201,14 @@ int main() {
     auto &world = WorldRender::getInstance();
 
 	snow_elements_pos.push_back(glm::vec2(10.0f, 10.0f));
-	snow_elements_pos.push_back(glm::vec2(-10.0f, 10.0f));
-	snow_elements_pos.push_back(glm::vec2(10.0f, -10.0f));
+	snow_elements_pos.push_back(glm::vec2(-10.0f, 14.0f));
+	snow_elements_pos.push_back(glm::vec2(10.0f, -15.0f));
 	snow_elements_pos.push_back(glm::vec2(-10.0f, -10.0f));
 
-	fire_elements_pos.push_back(glm::vec3(50.0f, 10.0f, 0.0f));
-	fire_elements_pos.push_back(glm::vec3(9.0f, 10.0f, 9.0f));
-	fire_elements_pos.push_back(glm::vec3(8.0f, 10.0f, 8.0f));
-	fire_elements_pos.push_back(glm::vec3(7.0f, 10.0f, 7.0f));
+	fire_elements_pos.push_back(glm::vec3(50.0f, 7.0f, 0.0f));
+	fire_elements_pos.push_back(glm::vec3(-42.0f, 9.0f, -11.0f));
+	fire_elements_pos.push_back(glm::vec3(1.0f, 9.0f, -34.0f));
+	fire_elements_pos.push_back(glm::vec3(-65.5f, 27.25f, -85.0f));
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // render loop
@@ -274,10 +274,10 @@ int main() {
 			//drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
 			drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
 			if (have_snowman < 2) {
-				drawModel(shadow.shadowShader, snowMan, glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.0f, snow_elements_pos[have_snowman].y), glm::vec3(1.0f));
+				drawModel(shadow.shadowShader, snowMan, glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.2f, snow_elements_pos[have_snowman].y), glm::vec3(1.0f));
 			}
 			else if (have_penguin < 2) {
-				drawModel(shadow.shadowShader, penguin, glm::vec3(snow_elements_pos[have_penguin + 2].x, snowman_frame * 0.02f + 1.0f, snow_elements_pos[have_penguin + 2].y), glm::vec3(0.01f));
+				drawModel(shadow.shadowShader, penguin, glm::vec3(snow_elements_pos[have_penguin + 2].x, snowman_frame * 0.02f + 1.5f, snow_elements_pos[have_penguin + 2].y), glm::vec3(0.01f));
 			}
 
 
@@ -355,10 +355,10 @@ int main() {
 			//drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
 			drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
 			if (have_snowman < 2) {
-				drawModel(model_shader, snowMan, glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.0f, snow_elements_pos[have_snowman].y), glm::vec3(1.0f));
+				drawModel(model_shader, snowMan, glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.2f, snow_elements_pos[have_snowman].y), glm::vec3(1.0f));
 			}
 			else if (have_penguin < 2) {
-				drawModel(model_shader, penguin, glm::vec3(snow_elements_pos[have_penguin + 2].x, snowman_frame * 0.02f + 1.0f, snow_elements_pos[have_penguin + 2].y), glm::vec3(0.01f));
+				drawModel(model_shader, penguin, glm::vec3(snow_elements_pos[have_penguin + 2].x, snowman_frame * 0.02f + 1.5f, snow_elements_pos[have_penguin + 2].y), glm::vec3(0.01f));
 			}
 
 			drawModel(model_shader, chair1, glm::vec3(7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
@@ -393,8 +393,23 @@ int main() {
 		}
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		render.RenderText("Enjoy-The-Beach", header,
-			1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+		
+		if (stage_mode) {
+			render.RenderText("Enjoy The Snow Mountain", header,
+				1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+			render.RenderText("Fire: " + to_string(have_fire), glm::vec2(SCR_WIDTH / 2 + 380, SCR_HEIGHT - 60),
+				0.5f, glm::vec3(1.0f));
+			render.RenderText("Cactus: " + to_string(have_cactus), glm::vec2(SCR_WIDTH / 2 + 380, SCR_HEIGHT - 90),
+				0.5f, glm::vec3(1.0f));
+		}
+		else {
+			render.RenderText("Enjoy The Beach", header,
+				1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+			render.RenderText("SnowMan: " + to_string(have_snowman), glm::vec2(SCR_WIDTH / 2 + 330, SCR_HEIGHT - 60),
+				0.5f, glm::vec3(1.0f));
+			render.RenderText("Penguin: " + to_string(have_penguin), glm::vec2(SCR_WIDTH / 2 + 330, SCR_HEIGHT - 90),
+				0.5f, glm::vec3(1.0f));
+		}
 
         // render
         ImGui::Render();
@@ -502,6 +517,7 @@ void drawModel(Shader &model_shader, Model &modelObj, glm::vec3 position, glm::v
 
 void checkCollision() {
 	int border_box = 1.0f;
+	//cout << camera.Position.x << ' ' << camera.Position.y << ' ' << camera.Position.z << endl;
 	// Check beach objects collision
 	if ((camera.Position.x >= snow_elements_pos[current_hot_index].x - border_box && camera.Position.x <= snow_elements_pos[current_hot_index].x + border_box) &&
 		(camera.Position.y >= current_z - border_box && camera.Position.y <= current_z + border_box) &&
@@ -517,7 +533,9 @@ void checkCollision() {
 		}
 		if(current_hot_index == 4) {
 			// Set jump into snow mountains
+			camera.Position = glm::vec3(52.0f, 18.0f, 66.0f);
 			stage_mode = true;
+			scene_mode = 1;
 			current_hot_index = 0;
 			have_penguin = 0;
 			have_snowman = 0;
@@ -539,7 +557,9 @@ void checkCollision() {
 		}
 		if (current_cold_index == 4) {
 			// Set jump into snow mountains
+			camera.Position = glm::vec3(0.0f, 2.0f, 0.0f);
 			stage_mode = false;
+			scene_mode = 0;
 			current_cold_index = 0;
 			have_fire = 0;
 			have_cactus = 0;
