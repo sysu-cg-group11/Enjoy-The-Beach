@@ -51,7 +51,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // View position and light position
-float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { -12.0f, 15.0f, -12.0f };
+float eyeValue[3] = { 5.0, 5.0, 10.0 }, lightValue[3] = { -12.0f, 25.0f, -12.0f };
 
 // Head themes location
 glm::vec2 header(SCR_WIDTH / 2 - 200, SCR_HEIGHT - 80);
@@ -262,8 +262,8 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,
                                                 500.0f);
 
-        GLfloat near_plane = 1.0f, far_plane = 30.0f;
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        GLfloat near_plane = 1.00f, far_plane = 35.0f;
+		glm::mat4 lightProjection = glm::ortho(-80.0f, 80.0f, -80.0f, 80.0f, near_plane, far_plane);
         glm::mat4 lightView = glm::lookAt(glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.0f),glm::vec3(0.0, 1.0, 0.0));
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
         //model_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
@@ -293,7 +293,6 @@ int main() {
 			world.drawScene(shadow.shadowShader);
 			world.drawObject(shadow.shadowShader);
 			drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
-			drawModel(shadow.shadowShader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
 			drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
 			drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
 			drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f), glm::vec3(0.0f, 180.0f, 0.0f));
@@ -403,8 +402,8 @@ int main() {
 			drawModel(model_shader, volcano, glm::vec3(-25.0f, 1.0f, -25.0f), glm::vec3(1.0f));
 		}
 		else {
-			//drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
-			drawModel(model_shader, snowMountain, glm::vec3(0.0f), glm::vec3(10.0f));
+            drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
+            drawModel(model_shader, snowMountain, glm::vec3(0.0f), glm::vec3(10.0f));
 			drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
 			if (have_fire < 2) {
 				drawModel(model_shader, fire, glm::vec3(fire_elements_pos[have_fire].x, fire_elements_pos[have_fire].y, fire_elements_pos[have_fire].z), glm::vec3(2.0f));

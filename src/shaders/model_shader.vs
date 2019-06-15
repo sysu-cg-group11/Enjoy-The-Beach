@@ -24,7 +24,7 @@ void main()
 {
 	if(type == 0) {
 		gl_Position = projection * view * model * vec4(aPos + aOffset, 1.0f);
-	    vs_out.FragPos = vec3(model * vec4(aPos, 1.0f));
+	    vs_out.FragPos = vec3(model * vec4(aPos + aOffset, 1.0f));
 	    vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
 	    vs_out.TexCoords = aTexCoords;
 	    vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0f);
@@ -34,6 +34,7 @@ void main()
 		vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
 		vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
 		vs_out.TexCoords = aTexCoords;
+		vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0f);
 	}
 
 }

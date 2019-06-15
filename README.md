@@ -52,7 +52,7 @@ cmake .. -G "Visual Studio 15 2017 Win64"
 
    ![](images/light-4.png)
 
-3. **Texture Mapping: **
+3.  **Texture Mapping: **
 
    为模型添加不同的纹理，使模型可显示出更加真实的表面细节：
 
@@ -60,4 +60,9 @@ cmake .. -G "Visual Studio 15 2017 Win64"
 
 4. **Model import & Mesh viewing:**
 
-   
+   通过加载模型来实现两个场景中不同实体的实现。
+
+5. **Shadow Mapping:**
+
+   通过光源视角渲染获得深度贴图，在渲染时可判断点是否在光照范围之内，从而生成阴影效果。
+
