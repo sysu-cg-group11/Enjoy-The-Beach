@@ -65,7 +65,10 @@ glm::vec3 player_angle(0.0f);
 int have_snowman = 0, have_penguin = 0, current_cold_index = 0, current_hot_index = 0;
 int have_fire = 0, have_cactus = 0;
 float current_z = 0.0f;
-bool stage_mode = false;
+
+bool stage_mode = false, view_mode = false;
+bool player_dirs[4] = { false, false, false, false };
+
 unsigned int cubemapTexture;
 
 vector<glm::vec2> snow_elements_pos;
@@ -226,6 +229,10 @@ int main() {
 		snowman_frame += dir;
 		current_z = snowman_frame * 0.02f + 1.0f;
 
+		player_pos = glm::vec3(camera.Position.x + (view_mode ? 0.5 : 6) * camera.Front.x,
+			camera.Position.y + (view_mode ? 0.5 : 6) * camera.Front.y,
+			camera.Position.z + (view_mode ? 0.5 : 6) * camera.Front.z);
+
         // input
         processInput(window);
 		checkCollision();
@@ -266,13 +273,26 @@ int main() {
         auto prevViewport = shadow.bind();
         shadow.shadowShader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
-		drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
+		float v_offset = 0.0f, h_offset = 0.0f;
+		if (player_dirs[0]) {
+			v_offset = 0.1f;
+		}
+		else if (player_dirs[2]) {
+			v_offset = -0.1f;
+		}
+
+		if (player_dirs[1]) {
+			h_offset = 0.3f;
+		}
+		else if (player_dirs[3]) {
+			h_offset = -0.3f;
+		}
 
 		if (!stage_mode) {
 			//Draw scene from light's perspective
 			world.drawScene(shadow.shadowShader);
 			world.drawObject(shadow.shadowShader);
-			//drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(285.0f, 0.0f, 182.0f), player_angle);
+			drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
 			drawModel(shadow.shadowShader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
 			drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
 			drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
@@ -303,7 +323,7 @@ int main() {
 		else {
 			//drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
 			drawModel(shadow.shadowShader, snowMountain, glm::vec3(0.0f), glm::vec3(10.0f));
-
+			drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
 			if (have_fire < 2) {
 				drawModel(shadow.shadowShader, fire, glm::vec3(fire_elements_pos[have_fire].x, fire_elements_pos[have_fire].y, fire_elements_pos[have_fire].z), glm::vec3(2.0f));
 			}
@@ -355,7 +375,7 @@ int main() {
 		if (!stage_mode) {
 			world.drawScene(model_shader);
 			world.drawObject(model_shader);
-			//drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(285.0f, 0.0f, 182.0f), player_angle);
+			drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
 			drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
 			drawModel(model_shader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
 			drawModel(model_shader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
@@ -385,7 +405,7 @@ int main() {
 		else {
 			//drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.0f), player_angle);
 			drawModel(model_shader, snowMountain, glm::vec3(0.0f), glm::vec3(10.0f));
-
+			drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
 			if (have_fire < 2) {
 				drawModel(model_shader, fire, glm::vec3(fire_elements_pos[have_fire].x, fire_elements_pos[have_fire].y, fire_elements_pos[have_fire].z), glm::vec3(2.0f));
 			}
@@ -452,9 +472,6 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 
     camera.ProcessMouseMovement(xoffset, yoffset);
 
-	player_pos = glm::vec3(camera.Position.x + 8 * camera.Front.x,
-		camera.Position.y + 8 * camera.Front.y,
-		camera.Position.z + 8 * camera.Front.z);
 	player_angle = glm::vec3(camera.Pitch, -90 - camera.Yaw, 0.0f);
 }
 
@@ -476,8 +493,10 @@ void processInput(GLFWwindow *window)
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
 		scene_mode = 0;
+		//view_mode = !view_mode;
+	}
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		scene_mode = 1 ;
 	static bool lightPressed = false;
@@ -489,14 +508,35 @@ void processInput(GLFWwindow *window)
         lightValue[2] = -lightValue[2];
         lightPressed = false;
     }
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ||
-		glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ||
-		glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ||
-		glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		player_pos = glm::vec3(camera.Position.x + 8 * camera.Front.x,
-			camera.Position.y + 8 * camera.Front.y,
-			camera.Position.z + 8 * camera.Front.z);
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		player_dirs[0] = true;
 	}
+	else {
+		player_dirs[0] = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		player_dirs[1] = true;
+	}
+	else {
+		player_dirs[1] = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		player_dirs[2] = true;
+	}
+	else {
+		player_dirs[2] = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		player_dirs[3] = true;
+	}
+	else {
+		player_dirs[3] = false;
+	}
+
 	
 }
 
@@ -511,9 +551,9 @@ void drawModel(Shader &model_shader, Model &modelObj, glm::vec3 position, glm::v
 
     glm::mat4 model(1.0f);
     model = glm::translate(model, position);
-	model = glm::rotate(model, rotate2.z, glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::rotate(model, rotate2.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, rotate2.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(rotate2.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, glm::radians(rotate2.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(rotate2.x), glm::vec3(1.0f, 0.0f, 0.0f));
 
     model = glm::rotate(model, rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -528,9 +568,9 @@ void checkCollision() {
 	int border_box = 1.0f;
 	//cout << camera.Position.x << ' ' << camera.Position.y << ' ' << camera.Position.z << endl;
 	// Check beach objects collision
-	if ((camera.Position.x >= snow_elements_pos[current_hot_index].x - border_box && camera.Position.x <= snow_elements_pos[current_hot_index].x + border_box) &&
-		(camera.Position.y >= current_z - border_box && camera.Position.y <= current_z + border_box) &&
-		(camera.Position.z >= snow_elements_pos[current_hot_index].y - border_box && camera.Position.z <= snow_elements_pos[current_hot_index].y + border_box)) {
+	if ((player_pos.x >= snow_elements_pos[current_hot_index].x - border_box && player_pos.x <= snow_elements_pos[current_hot_index].x + border_box) &&
+		(player_pos.y >= current_z - border_box && player_pos.y <= current_z + border_box) &&
+		(player_pos.z >= snow_elements_pos[current_hot_index].y - border_box && player_pos.z <= snow_elements_pos[current_hot_index].y + border_box)) {
 		// Collision
 		if (current_hot_index < 2) {
 			have_snowman += 1;
@@ -552,9 +592,9 @@ void checkCollision() {
 		}
 	}
 	// Check mountain objects collision
-	if ((camera.Position.x >= fire_elements_pos[current_cold_index].x - border_box && camera.Position.x <= fire_elements_pos[current_cold_index].x + border_box) &&
-		(camera.Position.z >= fire_elements_pos[current_cold_index].z - border_box && camera.Position.z <= fire_elements_pos[current_cold_index].z + border_box) &&
-		(camera.Position.y >= fire_elements_pos[current_cold_index].y - border_box && camera.Position.y <= fire_elements_pos[current_cold_index].y + border_box)) {
+	if ((player_pos.x >= fire_elements_pos[current_cold_index].x - border_box && player_pos.x <= fire_elements_pos[current_cold_index].x + border_box) &&
+		(player_pos.z >= fire_elements_pos[current_cold_index].z - border_box && player_pos.z <= fire_elements_pos[current_cold_index].z + border_box) &&
+		(player_pos.y >= fire_elements_pos[current_cold_index].y - border_box && player_pos.y <= fire_elements_pos[current_cold_index].y + border_box)) {
 		// Collision
 		if (current_cold_index < 2) {
 			have_fire += 1;
