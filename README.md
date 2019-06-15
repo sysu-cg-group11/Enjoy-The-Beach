@@ -42,21 +42,21 @@ cmake .. -G "Visual Studio 15 2017 Win64"
 
    *沙滩：*
 
-   ![](screenshoot/light-1.png)
+   ![](images/light-1.png)
 
-   ![](screenshoot/light-2.png)
+   ![](images/light-2.png)
 
    *雪山：*
 
-   ![](screenshoot/light-3.png)
+   ![](images/light-3.png)
 
-   ![](screenshoot/light-4.png)
+   ![](images/light-4.png)
 
 3. **Texture Mapping: **
 
    为模型添加不同的纹理，使模型可显示出更加真实的表面细节：
 
-   ![](screenshoot/texture-1.png)
+   ![](images/texture-1.png)
 
 4. **Model import & Mesh viewing:**
 
