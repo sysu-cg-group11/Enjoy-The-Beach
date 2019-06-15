@@ -1,4 +1,6 @@
 #include <shader.h>
+#include <sstream>
+#include <string>
 
 Shader::Shader(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile) {
     // 1. Retrieve the vertex/fragment source code from filePath
@@ -233,8 +235,16 @@ void Shader::checkCompileErrors(GLuint object, std::string type, const GLchar *c
         if (!success) {
             glGetShaderInfoLog(object, 1024, NULL, infoLog);
             std::cout << "| ERROR::SHADER: Compile-time error: Type: " << type << "\n"
-                      << codes << "\n -- --------------------------------------------------- -- "
                       << std::endl;
+        }
+        if (!success) {
+            char log[512];
+            glGetShaderInfoLog(object, 512, nullptr, log);
+            std::stringstream errStream;
+            errStream << type << " compile error: " << log;
+            std::string x = errStream.str();
+            std::cerr << x << std::endl;
+            exit(1);
         }
     } else {
         glGetProgramiv(object, GL_LINK_STATUS, &success);
@@ -243,6 +253,14 @@ void Shader::checkCompileErrors(GLuint object, std::string type, const GLchar *c
             std::cout << "| ERROR::Shader: Link-time error: Type: " << type << "\n"
                       << codes << "\n -- --------------------------------------------------- -- "
                       << std::endl;
+        }
+        if (!success) {
+            char log[512];
+            glGetShaderInfoLog(object, 512, nullptr, log);
+            std::stringstream errStream;
+            errStream << type << " compile error: " << log;
+            std::string x = errStream.str();
+            throw x;
         }
     }
 }
