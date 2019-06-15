@@ -9,4 +9,6 @@
 !/dependencies/**
 !CG_Project.pptx
 !demo.mp4
+!reports
+!images
 !CMakeLists.txt
