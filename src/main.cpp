@@ -290,8 +290,10 @@ int main() {
 
 		if (!stage_mode) {
 			//Draw scene from light's perspective
+			shadow.shadowShader.SetBool("useOffset", true);
 			world.drawScene(shadow.shadowShader);
 			world.drawObject(shadow.shadowShader);
+            shadow.shadowShader.SetBool("useOffset", false);
 			drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
 			drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
 			drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));

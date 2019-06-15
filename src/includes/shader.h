@@ -52,6 +52,8 @@ public:
 
     void SetMatrix4(const GLchar *name, const glm::mat4 &matrix, GLboolean useShader = false);
 
+    void SetBool(const GLchar *name, bool b, GLboolean useShader = false);
+
 private:
     // Checks if compilation or linking failed and if so, print the error logs
     void checkCompileErrors(GLuint object, std::string type, const GLchar *codes);

@@ -246,3 +246,10 @@ void Shader::checkCompileErrors(GLuint object, std::string type, const GLchar *c
         }
     }
 }
+
+void Shader::SetBool(const GLchar *name, const bool b, GLboolean useShader) {
+    if (useShader)
+        this->Use();
+    glUniform1i(glGetUniformLocation(this->ID, name), (int)b);
+
+}
