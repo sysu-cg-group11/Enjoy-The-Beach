@@ -12,7 +12,7 @@ public:
 
     Shader shadowShader;
     GLuint depthMap;
-    GLuint height = 2048, width = 2048;
+    GLuint height = 4096 * 2, width = 4096 * 2;
 
     Shadow(const Shadow &ano) = delete;
 

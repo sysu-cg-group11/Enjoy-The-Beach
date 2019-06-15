@@ -9,13 +9,14 @@
 #include <GLFW/glfw3.h>
 #include <thread>
 
-#include <shader.h>
 #include <data.h>
 #include <camera.h>
 #include "font_render.h"
 #include "world_render.h"
 #include "model.h"
 #include "Shadow.h"
+
+#include "water.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -94,6 +95,21 @@ std::vector<std::string> cold_faces
 	"../resources/textures/skybox/sky-cold.jpg"
 };
 
+//water
+static struct {
+	GLuint vertex_buffer, normal_buffer;
+	GLuint diffuse_texture, normal_texture;
+
+	struct {
+		GLint diffuse_texture, normal_texture;
+	} uniforms;
+
+	struct {
+		GLint position;
+		GLint normal;
+	} attributes;
+} names;
+
 int main() {
     // glfw: initialize and configure
     // ------------------------------
@@ -147,7 +163,7 @@ int main() {
 	Shader shader("../src/shaders/shader.vs", "../src/shaders/shader.fs");
 	Shader model_shader("../src/shaders/model_shader.vs", "../src/shaders/model_shader.fs");
 	Shader font_shader("../src/shaders/font_shader.vs", "../src/shaders/font_shader.fs");
-	
+	Shader water_shader("../src/shaders/water.vs", "../src/shaders/water.fs");
 
 	// Set font infos
 	font_shader.SetMatrix4("projection", glm::ortho(0.0f, (float)SCR_WIDTH, 0.0f, (float)SCR_HEIGHT), true);
@@ -214,6 +230,40 @@ int main() {
 	fire_elements_pos.push_back(glm::vec3(1.0f, 9.0f, -34.0f));
 	fire_elements_pos.push_back(glm::vec3(-65.5f, 27.25f, -85.0f));
 
+	//water
+	water_shader.Use();
+	initWave();
+	glm::vec4 materAmbient( 0.1, 0.1, 0.3, 1.0 );
+	glm::vec4 materSpecular( 0.8, 0.8, 0.9, 1.0 );
+	glm::vec4 lightDiffuse( 0.7, 0.7, 0.8, 1.0 );
+	glm::vec4 lightAmbient( 0.0, 0.0, 0.0, 1.0 );
+	glm::vec4 lightSpecular( 1.0, 1.0, 1.0, 1.0 );
+	glm::vec4 envirAmbient( 0.1, 0.1, 0.3, 1.0 );
+	water_shader.SetVector4f("materAmbient", materAmbient);
+	water_shader.SetVector4f("materSpecular", materSpecular);
+	water_shader.SetVector4f("lightDiffuse", lightDiffuse);
+	water_shader.SetVector4f("lightAmbient", lightAmbient);
+	water_shader.SetVector4f("lightSpecular", lightSpecular);
+	water_shader.SetVector4f("envirAmbient", envirAmbient);
+	names.attributes.position = glGetAttribLocation(water_shader.ID, "position");
+	glGenBuffers(1, &names.vertex_buffer);
+	names.attributes.normal = glGetAttribLocation(water_shader.ID, "normal");
+	glGenBuffers(1, &names.normal_buffer);
+	names.diffuse_texture = initTexture(diff_texture.c_str());
+	names.uniforms.diffuse_texture = glGetUniformLocation(water_shader.ID, "textures[0]");
+	glUniform1i(names.uniforms.diffuse_texture, 0);
+	names.normal_texture = initTexture(norm_texture.c_str());
+	names.uniforms.normal_texture = glGetUniformLocation(water_shader.ID, "textures[1]");
+	glUniform1i(names.uniforms.normal_texture, 1);
+	glm::mat4 Projection = glm::perspective(45.0f, (float)(SCR_WIDTH / SCR_HEIGHT), 1.0f, 100.f);
+	glm::mat4 viewTransMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f));
+	glm::mat4 viewRotateMat = glm::rotate(viewTransMat, -45.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 ModelViewMat = glm::scale(viewRotateMat, glm::vec3(1.0f, 1.0f, 1.0f));
+	glm::mat3 NormalMat = glm::transpose(glm::inverse(glm::mat3(ModelViewMat)));
+	water_shader.SetMatrix4("modelViewMat", ModelViewMat);
+	water_shader.SetMatrix4("perspProjMat", Projection);
+	water_shader.SetMatrix4("normalMat", NormalMat);
+
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // render loop
     while (!glfwWindowShouldClose(window)) {
@@ -251,7 +301,34 @@ int main() {
                     ImGui::GetIO().Framerate);
         ImGui::End();
 
+		glDepthFunc(GL_LESS);
 
+		//water
+		calcuWave();
+		water_shader.SetInteger("time", values.time);
+
+		glBindBuffer(GL_ARRAY_BUFFER, names.vertex_buffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+		glVertexAttribPointer(names.attributes.position, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void*)0);
+		glEnableVertexAttribArray(names.attributes.position);
+
+		glBindBuffer(GL_ARRAY_BUFFER, names.normal_buffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(normal_data), normal_data, GL_STATIC_DRAW);
+		glVertexAttribPointer(names.attributes.normal, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void*)0);
+		glEnableVertexAttribArray(names.attributes.normal);
+
+		for (int c = 0; c < (STRIP_COUNT - 1); c++) {
+			//std::cout << c << std::endl;
+			glDrawArrays(GL_TRIANGLE_STRIP, STRIP_LENGTH * 2 * c, STRIP_LENGTH * 2);
+		}
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, names.normal_texture);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, names.diffuse_texture);
+
+		/*
         glDepthFunc(GL_LEQUAL);
 
         glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
@@ -439,7 +516,7 @@ int main() {
 				0.5f, glm::vec3(1.0f));
 			render.RenderText("Penguin: " + to_string(have_penguin), glm::vec2(SCR_WIDTH / 2 + 330, SCR_HEIGHT - 90),
 				0.5f, glm::vec3(1.0f));
-		}
+		}*/
 
         // render
         ImGui::Render();
@@ -448,6 +525,8 @@ int main() {
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+		values.time += 0.05;
     }
 
     // de-allocate all resources once they've outlived their purpose:

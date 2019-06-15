@@ -148,7 +148,7 @@ void FontRender::RenderText(string text, glm::vec2 postion, GLfloat scale, glm::
         glBindBuffer(GL_ARRAY_BUFFER, this->fontVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices),
                         vertices); // Be sure to use glBufferSubData and not glBufferData
-
+		
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         // Render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
