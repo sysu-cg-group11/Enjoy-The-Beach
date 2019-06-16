@@ -311,7 +311,6 @@ int main() {
 				drawModel(shadow.shadowShader, penguin, glm::vec3(snow_elements_pos[have_penguin + 2].x, snowman_frame * 0.02f + 1.5f, snow_elements_pos[have_penguin + 2].y), glm::vec3(0.01f));
 			}
 
-
 			drawModel(shadow.shadowShader, chair1, glm::vec3(7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
 			drawModel(shadow.shadowShader, chair1, glm::vec3(0.0f, 2.0f, 15.0f), glm::vec3(0.02f));
 			drawModel(shadow.shadowShader, chair1, glm::vec3(-7.0f, 2.0f, 15.0f), glm::vec3(0.02f));
@@ -325,7 +324,7 @@ int main() {
 
 			drawModel(shadow.shadowShader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
 
-			drawModel(shadow.shadowShader, volcano, glm::vec3(-25.0f, 1.0f, -25.0f), glm::vec3(1.0f));
+			drawModel(shadow.shadowShader, volcano, glm::vec3(-30.0f, -1.0f, -30.0f), glm::vec3(1.0f));
 		}
 		else {
 			drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
@@ -434,7 +433,7 @@ int main() {
 
 				drawModel(model_shader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
 
-				drawModel(model_shader, volcano, glm::vec3(-25.0f, 1.0f, -25.0f), glm::vec3(1.0f));
+				drawModel(model_shader, volcano, glm::vec3(-30.0f, -1.0f, -30.0f), glm::vec3(1.0f));
 			}
 			else {
 				drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
@@ -619,7 +618,6 @@ void drawModel(Shader &model_shader, Model &modelObj, glm::vec3 position, glm::v
 
 void checkCollision() {
 	int border_box = 1.0f;
-	//cout << camera.Position.x << ' ' << camera.Position.y << ' ' << camera.Position.z << endl;
 	// Check beach objects collision
 	if ((player_pos.x >= snow_elements_pos[current_hot_index].x - border_box && player_pos.x <= snow_elements_pos[current_hot_index].x + border_box) &&
 		(player_pos.y >= current_z - border_box && player_pos.y <= current_z + border_box) &&

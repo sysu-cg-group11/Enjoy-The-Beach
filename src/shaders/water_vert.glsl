@@ -17,7 +17,7 @@ const float tiling = 4.0;
 
 void main()
 {
-	vec4 worldPosition = modelMatrix * vec4(position.x, 0.07, position.y, 1.0);
+	vec4 worldPosition = modelMatrix * vec4(position.x, 0.01, position.y, 1.0);
 	clipSpace = projectionMatrix * viewMatrix * worldPosition;
 	gl_Position = clipSpace;
 	textureCoords = vec2(position.x / 2.0 + 0.5, position.y / 2.0 + 0.5) * tiling;

@@ -20,18 +20,10 @@ AnimationTexture::AnimationTexture(GLenum TextureTarget, const std::string& File
 bool AnimationTexture::Load()
 {
 	int width, height, nrChannels;
-	//try {
-	//m_image.read(m_fileName);
-	//m_image.write(&m_blob, "RGBA");
+	
 	stbi_set_flip_vertically_on_load(true);
 
 	m_blob = stbi_load(m_fileName.c_str(), &width, &height, &nrChannels, 0);
-	//m_blob = stbi_load("resources/Models/oliver-golpeo-balon/source/OLIVER1.jpg", &width, &height, &nrChannels, 0);
-	/*}
-	catch (Magick::Error& Error) {
-	std::cout << "Error loading texture '" << m_fileName << "': " << Error.what() << std::endl;
-	return false;
-	}*/
 
 	glGenTextures(1, &m_textureObj);
 	glBindTexture(m_textureTarget, m_textureObj);

@@ -1,5 +1,8 @@
 #include <world_render.h>
 
+#include <algorithm>
+
+using namespace std;
 
 void WorldRender::SingleRender(Shader &shader, int count, glm::vec3 *position, CubeRender::BlockType block) {
     glBindBuffer(GL_ARRAY_BUFFER, renderer->getInstanceVBO());
@@ -57,8 +60,40 @@ void WorldRender::drawScene(Shader &shader) {
 
     SingleRender(shader, sand_count, sand_position, renderer->SAND);
 	
+	// Render underwater sands
+	int underwater_sand_count = 1400, height = 0.0f;
+	glm::vec3 underwater_sand_position[1400];
+
+	index = 0;
+
+	for (int i = -20; i > -40; i--) {
+		if (i % 5 == 0)
+			height -= 1.0f;
+
+		for (int j = -20; j < 20; j++) {
+			glm::vec3 pos = glm::vec3((float)i, height, (float)j);
+			underwater_sand_position[index++] = pos;
+		}
+	}
+
+	int upper_width = 40, lower_width = 20;
+	int upper_height = 10, lower_height = -20;
+
+	for (int i = 20; i < 40; i++) {
+		for (int j = -20; j < 10; j++) {
+			int min_width_dis = min(i - lower_width, upper_width - i),
+				min_height_dis = min(j - lower_height, upper_height - j),
+				min_down = min(min_width_dis, min_height_dis);
+
+			glm::vec3 pos = glm::vec3((float)i, -min_down * 0.8f, (float)j);
+			underwater_sand_position[index++] = pos;
+		}
+	}
+
+	SingleRender(shader, underwater_sand_count, underwater_sand_position, renderer->SAND);
 
     // Render Water
+	/*
     glm::vec3 water_position[6400];
     int water_count = 6400;
     index = 0;
@@ -69,7 +104,7 @@ void WorldRender::drawScene(Shader &shader) {
         }
     }
 
-
     SingleRender(shader, water_count, water_position, renderer->WATER);
+	*/
 	
 }
