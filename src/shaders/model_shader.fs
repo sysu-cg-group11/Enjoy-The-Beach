@@ -23,6 +23,8 @@ uniform float shininess;
 uniform float diffuseFactor;
 uniform vec3 sprite_color;
 
+uniform int gammaMode;
+
 uniform int type;
 
 
@@ -75,7 +77,12 @@ void main()
         vec4 texColor = texture(diffuseTexture, fs_in.TexCoords);
         if(texColor.a < 0.1)
             discard;
-        vec3 objectColor = texture(diffuseTexture, fs_in.TexCoords).rgb;
+        float gamma = 2.2;
+        vec3 objectColor;
+        if (gammaMode == 0)
+            objectColor = pow(texture(diffuseTexture, fs_in.TexCoords).rgb, vec3(gamma));
+        else
+            objectColor = texture(diffuseTexture, fs_in.TexCoords).rgb;
 
         vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * objectColor;
         FragColor = vec4(lighting, 1.0);
@@ -91,4 +98,5 @@ void main()
         }
         
     }
+
 }
