@@ -18,7 +18,7 @@ Snow::Snow()
 	//设置随机纹理
 	InitRandomTexture(512);
 	CubeRender cr;
-	mSparkTexture = cr.loadTexture("../resources/particle/snowstorm.bmp");
+	mSparkTexture = loadTexture("../resources/particle/snowstorm.bmp");
 	mRenderShader->Use();
 	mRenderShader->SetInteger("snowflower", 0);
 	glUseProgram(0);

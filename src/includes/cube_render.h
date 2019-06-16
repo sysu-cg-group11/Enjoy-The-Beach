@@ -112,10 +112,6 @@ public:
         return instanceVBO;
     }
 
-    unsigned int loadTexture(const GLchar *path);
-
-    unsigned int *loadTextures(const GLchar *path, int count);
-
     void initTextures();
 
     // Render Cube
@@ -141,5 +137,9 @@ private:
     unsigned int cubeVBO_top, cubeVBO_bottom, cubeVBO_left, cubeVBO_right, cubeVBO_front, cubeVBO_back, crossVAO;
     unsigned int cubeVAO_top, cubeVAO_bottom, cubeVAO_left, cubeVAO_right, cubeVAO_front, cubeVAO_back, crossVBO;
 };
+
+unsigned int loadTexture(const GLchar *path);
+
+unsigned int *loadTextures(const GLchar *path, int count);
 
 #endif

@@ -36,6 +36,7 @@ public:
 
 private:
     CubeRender *renderer;
+
 };
 
 

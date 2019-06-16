@@ -20,9 +20,14 @@ uniform mat4 lightSpaceMatrix;
 
 uniform int type;
 
+uniform vec4 plane;
+
 void main()
-{
+{	
 	if(type == 0) {
+		vec4 worldPosition = model * vec4(aPos + aOffset, 1.0f);
+		gl_ClipDistance[0] = dot(worldPosition, plane);
+
 		gl_Position = projection * view * model * vec4(aPos + aOffset, 1.0f);
 	    vs_out.FragPos = vec3(model * vec4(aPos + aOffset, 1.0f));
 	    vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
@@ -30,6 +35,9 @@ void main()
 	    vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0f);
 	}
 	else {
+		vec4 worldPosition = model * vec4(aPos, 1.0f);
+		gl_ClipDistance[0] = dot(worldPosition, plane);
+
 		gl_Position = projection * view * model * vec4(aPos, 1.0f);
 		vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
 		vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
