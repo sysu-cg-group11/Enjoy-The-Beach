@@ -339,19 +339,20 @@ int main() {
 		}
 
 		shadow.unbind(prevViewport);
-		
+
+        glGetIntegerv(GL_VIEWPORT, prevViewport.data());
 		for(int i = 0; i < 3; ++i){
 			glEnable(GL_CLIP_DISTANCE0);
 			float distance = 2 * (camera.Position.y - waters[0].getHeight());
 			if (i == 0) {	//reflection
-				fbos.bindReflectionFrameBuffer();
+				fbos.bindReflectionFrameBuffer(prevViewport[2], prevViewport[3]);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				camera.Position.y -= distance;
 				camera.Pitch = -camera.Pitch;
 				shader.SetVector4f("plane", glm::vec4(0, 1, 0, -waters[0].getHeight() + 0.2f));
 			}
 			else if (i == 1) {	//refraction
-				fbos.bindRefractionFrameBuffer();
+				fbos.bindRefractionFrameBuffer(prevViewport[2], prevViewport[3]);
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				shader.SetVector4f("plane", glm::vec4(0, -1, 0, waters[0].getHeight()));
@@ -360,6 +361,9 @@ int main() {
 				glDisable(GL_CLIP_DISTANCE0);
 				fbos.unbindCurrentFrameBuffer();
 			}
+
+            glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+
 
 			//Render scene
 			//Sky-box
@@ -466,8 +470,8 @@ int main() {
 		}
 
         //water
+
         waterRender.render(waters, camera);
-        glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
 
 		//Render text
 		glEnable(GL_BLEND);

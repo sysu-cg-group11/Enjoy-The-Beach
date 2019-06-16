@@ -48,12 +48,12 @@ void WaterFrameBuffers::cleanUp() {
     glDeleteTextures(1, &refractionDepthTexture);
 }
 
-void WaterFrameBuffers::bindRefractionFrameBuffer() {
-    bindFrameBuffer(refractionFrameBuffer, REFRACTION_WIDTH, REFRACTION_HEIGHT);
+void WaterFrameBuffers::bindRefractionFrameBuffer(int width, int height) {
+    bindFrameBuffer(refractionFrameBuffer, width, height);
 }
 
-void WaterFrameBuffers::bindReflectionFrameBuffer() {
-    bindFrameBuffer(reflectionFrameBuffer, REFLECTION_WIDTH, REFLECTION_HEIGHT);
+void WaterFrameBuffers::bindReflectionFrameBuffer(int width, int height) {
+    bindFrameBuffer(reflectionFrameBuffer, width, height);
 }
 
 void WaterFrameBuffers::unbindCurrentFrameBuffer() {

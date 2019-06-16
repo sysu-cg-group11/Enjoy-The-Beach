@@ -10,8 +10,9 @@
 #include <assimp/matrix4x4.h>
 
 #include "ogldev_util.h"
-
+#ifndef __APPLE__
 #define M_PI 3.14159265358979323846
+#endif
 
 #define ToRadian(x) (float)(((x) * M_PI / 180.0f))
 #define ToDegree(x) (float)(((x) * 180.0f / M_PI))

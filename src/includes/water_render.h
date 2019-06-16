@@ -40,8 +40,8 @@ private:
 public:
 	WaterFrameBuffers();
 	void cleanUp();
-	void bindReflectionFrameBuffer();
-	void bindRefractionFrameBuffer();
+	void bindReflectionFrameBuffer(int width, int height);
+	void bindRefractionFrameBuffer(int width, int height);
 	void unbindCurrentFrameBuffer();
 	int getReflectionTexture();
 	int getRefractionTexture();
