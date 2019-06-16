@@ -17,7 +17,7 @@
 */
 
 #ifndef OGLDEV_UTIL_H
-#define	OGLDEV_UTIL_H
+#define    OGLDEV_UTIL_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,11 +35,13 @@ typedef uint32_t u32;
 
 using namespace std;
 
-bool ReadFile(const char* fileName, string& outFile);
-char* ReadBinaryFile(const char* pFileName, int& size);
+bool ReadFile(const char *fileName, string &outFile);
 
-void OgldevError(const char* pFileName, uint line, const char* msg, ...);
-void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
+char *ReadBinaryFile(const char *pFileName, int &size);
+
+void OgldevError(const char *pFileName, uint line, const char *msg, ...);
+
+void OgldevFileError(const char *pFileName, uint line, const char *pFileError);
 
 #define OGLDEV_ERROR0(msg) OgldevError(__FILE__, __LINE__, msg)
 #define OGLDEV_ERROR(msg, ...) OgldevError(__FILE__, __LINE__, msg, __VA_ARGS__)
@@ -50,7 +52,7 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
 
 #ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
 #ifdef WIN32
@@ -87,5 +89,5 @@ long long GetCurrentTimeMillis();
 
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices)
 
-#endif	/* OGLDEV_UTIL_H */
+#endif    /* OGLDEV_UTIL_H */
 

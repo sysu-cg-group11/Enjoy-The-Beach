@@ -40,14 +40,14 @@ void WorldRender::DrawTree(CubeRender::BlockType tree_type, CubeRender::BlockTyp
 //Objects will be used in shadow map
 void WorldRender::drawObject(Shader &shader) {
     DrawTree(renderer->TREE_OAK, renderer->LEAVE_OAK, glm::vec3(-15.0f, 1.0f, 12.0f), shader);
-	DrawTree(renderer->TREE_BIRCH, renderer->LEAVE_BIRCH, glm::vec3(15.0f, 1.0f, 12.0f), shader);
-	DrawTree(renderer->TREE_JUNGLE, renderer->LEAVE_JUNGLE, glm::vec3(15.0f, 1.0f, -12.0f), shader);
-	DrawTree(renderer->TREE_JUNGLE, renderer->LEAVE_JUNGLE, glm::vec3(-15.0f, 1.0f, -12.0f), shader);
+    DrawTree(renderer->TREE_BIRCH, renderer->LEAVE_BIRCH, glm::vec3(15.0f, 1.0f, 12.0f), shader);
+    DrawTree(renderer->TREE_JUNGLE, renderer->LEAVE_JUNGLE, glm::vec3(15.0f, 1.0f, -12.0f), shader);
+    DrawTree(renderer->TREE_JUNGLE, renderer->LEAVE_JUNGLE, glm::vec3(-15.0f, 1.0f, -12.0f), shader);
 }
 
 void WorldRender::drawScene(Shader &shader) {
     // Draw Sands
-	
+
     int sand_count = 1600, index = 0;
     glm::vec3 sand_position[1600];
 
@@ -59,41 +59,41 @@ void WorldRender::drawScene(Shader &shader) {
     }
 
     SingleRender(shader, sand_count, sand_position, renderer->SAND);
-	
-	// Render underwater sands
-	int underwater_sand_count = 1400, height = 0.0f;
-	glm::vec3 underwater_sand_position[1400];
 
-	index = 0;
+    // Render underwater sands
+    int underwater_sand_count = 1400, height = 0.0f;
+    glm::vec3 underwater_sand_position[1400];
 
-	for (int i = -20; i > -40; i--) {
-		if (i % 5 == 0)
-			height -= 1.0f;
+    index = 0;
 
-		for (int j = -20; j < 20; j++) {
-			glm::vec3 pos = glm::vec3((float)i, height, (float)j);
-			underwater_sand_position[index++] = pos;
-		}
-	}
+    for (int i = -20; i > -40; i--) {
+        if (i % 5 == 0)
+            height -= 1.0f;
 
-	int upper_width = 40, lower_width = 20;
-	int upper_height = 10, lower_height = -20;
+        for (int j = -20; j < 20; j++) {
+            glm::vec3 pos = glm::vec3((float) i, height, (float) j);
+            underwater_sand_position[index++] = pos;
+        }
+    }
 
-	for (int i = 20; i < 40; i++) {
-		for (int j = -20; j < 10; j++) {
-			int min_width_dis = min(i - lower_width, upper_width - i),
-				min_height_dis = min(j - lower_height, upper_height - j),
-				min_down = min(min_width_dis, min_height_dis);
+    int upper_width = 40, lower_width = 20;
+    int upper_height = 10, lower_height = -20;
 
-			glm::vec3 pos = glm::vec3((float)i, -min_down * 0.8f, (float)j);
-			underwater_sand_position[index++] = pos;
-		}
-	}
+    for (int i = 20; i < 40; i++) {
+        for (int j = -20; j < 10; j++) {
+            int min_width_dis = min(i - lower_width, upper_width - i),
+                    min_height_dis = min(j - lower_height, upper_height - j),
+                    min_down = min(min_width_dis, min_height_dis);
 
-	SingleRender(shader, underwater_sand_count, underwater_sand_position, renderer->SAND);
+            glm::vec3 pos = glm::vec3((float) i, -min_down * 0.8f, (float) j);
+            underwater_sand_position[index++] = pos;
+        }
+    }
+
+    SingleRender(shader, underwater_sand_count, underwater_sand_position, renderer->SAND);
 
     // Render Water
-	/*
+    /*
     glm::vec3 water_position[6400];
     int water_count = 6400;
     index = 0;
@@ -105,6 +105,6 @@ void WorldRender::drawScene(Shader &shader) {
     }
 
     SingleRender(shader, water_count, water_position, renderer->WATER);
-	*/
-	
+    */
+
 }

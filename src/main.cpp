@@ -108,6 +108,9 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    //Anti-aliasing
+    glfwWindowHint(GLFW_SAMPLES, 4);
+
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
 #endif
@@ -233,6 +236,8 @@ int main() {
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // render loop
     while (!glfwWindowShouldClose(window)) {
+        //Anti-aliasing
+        glEnable(GL_MULTISAMPLE);
 
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -275,8 +280,8 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,
                                                 500.0f);
 
-        GLfloat near_plane = 0.1f, far_plane = 40.0f;
-        glm::mat4 lightProjection = glm::ortho(-80.0f, 80.0f, -80.0f, 80.0f, near_plane, far_plane);
+        GLfloat near_plane = 1.00f, far_plane = 45.0f;
+        glm::mat4 lightProjection = glm::ortho(-200.0f, 200.0f, -200.0f, 200.0f, near_plane, far_plane);
         glm::mat4 lightView = glm::lookAt(glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.0f),
                                           glm::vec3(0.0, 1.0, 0.0));
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;

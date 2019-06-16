@@ -87,7 +87,7 @@ void WaterFrameBuffers::initializeReflectionFrameBuffer() {
     glGenTextures(1, &reflectionTexture);
     glBindTexture(GL_TEXTURE_2D, reflectionTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, REFLECTION_WIDTH, REFLECTION_HEIGHT, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, (void*)nullptr);
+                 GL_UNSIGNED_BYTE, (void *) nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, reflectionTexture, 0);
@@ -109,7 +109,7 @@ void WaterFrameBuffers::initializeRefractionFrameBuffer() {
     glGenTextures(1, &refractionTexture);
     glBindTexture(GL_TEXTURE_2D, refractionTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, REFRACTION_WIDTH, REFRACTION_HEIGHT, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, (void*)nullptr);
+                 GL_UNSIGNED_BYTE, (void *) nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, refractionTexture, 0);
@@ -117,7 +117,7 @@ void WaterFrameBuffers::initializeRefractionFrameBuffer() {
     glGenTextures(1, &refractionDepthTexture);
     glBindTexture(GL_TEXTURE_2D, refractionDepthTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, REFRACTION_WIDTH, REFRACTION_HEIGHT,
-                 0, GL_DEPTH_COMPONENT, GL_FLOAT, (void*)nullptr);
+                 0, GL_DEPTH_COMPONENT, GL_FLOAT, (void *) nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, refractionDepthTexture, 0);
@@ -200,7 +200,7 @@ void WaterRender::prepareRender(Camera camera) {
 }
 
 void WaterRender::setUpVAO() {
-    float vertices[12] = { -2, 0, -2, 2, 0, 0, 0, 0, -2, 2, 0, 2 };
+    float vertices[12] = {-2, 0, -2, 2, 0, 0, 0, 0, -2, 2, 0, 2};
     dimensions = 2;
     VERTEX_COUNT = 12 / 2;
     glGenVertexArrays(1, &quad);
@@ -210,7 +210,7 @@ void WaterRender::setUpVAO() {
     glBindVertexArray(quad);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, dimensions, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(0, dimensions, GL_FLOAT, GL_FALSE, 0, (void *) 0);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

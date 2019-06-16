@@ -23,9 +23,10 @@ public:
     // Constructor
     Shader() {}
 
-    Shader(const char *vertexPath, const char *fragPath, const char *gShaderFile=nullptr);
-	Shader(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath,
-		const GLchar* varyings[], int count);
+    Shader(const char *vertexPath, const char *fragPath, const char *gShaderFile = nullptr);
+
+    Shader(const GLchar *vertexPath, const GLchar *fragmentPath, const GLchar *geometryPath,
+           const GLchar *varyings[], int count);
 
     // Sets the current shader as active
     Shader &Use();

@@ -26,7 +26,7 @@ unsigned int loadTexture(const GLchar *path) {
         std::cout << "Cubemap texture failed to load at path: " << path << std::endl;
         stbi_image_free(data);
     }
-	
+
     return textureID;
 }
 
