@@ -44,8 +44,8 @@ public:
 
 class WaterFrameBuffers {
 private:
-	const int REFLECTION_WIDTH = 320,
-		REFLECTION_HEIGHT = 180,
+	const int REFLECTION_WIDTH = 1280,
+		REFLECTION_HEIGHT = 720,
 		REFRACTION_WIDTH = 1280,
 		REFRACTION_HEIGHT = 720;
 	//reflection

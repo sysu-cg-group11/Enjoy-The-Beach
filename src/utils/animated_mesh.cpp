@@ -65,7 +65,7 @@ void AnimationMesh::VertexBoneData::AddBoneData(uint BoneID, float Weight)
     }
     
     // should never get here - more bones than we have space for
-    assert(0);
+//    assert(0);
 }
 
 AnimationMesh::AnimationMesh()

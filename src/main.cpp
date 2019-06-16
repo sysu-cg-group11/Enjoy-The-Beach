@@ -98,8 +98,16 @@ int main() {
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
-	
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Enjoy The Beach", NULL, NULL);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
+#endif
+
+
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Enjoy The Beach", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -345,6 +353,7 @@ int main() {
 			}
 			else if (i == 1) {	//refraction
 				fbos.bindRefractionFrameBuffer();
+
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				shader.SetVector4f("plane", glm::vec4(0, -1, 0, waters[0].getHeight()));
 			}
@@ -456,9 +465,10 @@ int main() {
 			}
 			
 		}
-		
-		//water
-		waterRender.render(waters, camera);
+
+        //water
+        waterRender.render(waters, camera);
+        glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
 
 		//Render text
 		glEnable(GL_BLEND);
