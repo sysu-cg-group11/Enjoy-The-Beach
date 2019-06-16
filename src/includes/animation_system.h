@@ -16,10 +16,12 @@ public:
 
 	void InitController();
 
+	void InitDepthShader(glm::mat4 lightSpaceMatrix);
 	void InitShader(glm::mat4 lightSpaceMatrix, unsigned int diffuseTexture, unsigned int shadowMap,
 					glm::vec3 lightPos, glm::vec3 viewPos, glm::mat4 projection, glm::mat4 view);
 
 	void Render();
+	void RenderDepth();
 
 private:
 	vector<AnimationModel*> animation_models;

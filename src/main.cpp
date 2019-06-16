@@ -278,6 +278,7 @@ int main() {
         auto &shadow = Shadow::getInstance();
         auto prevViewport = shadow.bind();
         shadow.shadowShader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+		animations.InitDepthShader(lightSpaceMatrix);
 
 		float v_offset = 0.0f, h_offset = 0.0f;
 		if (player_dirs[0]) {
@@ -300,6 +301,8 @@ int main() {
 			world.drawScene(shadow.shadowShader);
 			world.drawObject(shadow.shadowShader);
             shadow.shadowShader.SetInteger("useOffset", false);
+
+			animations.RenderDepth();
 			drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
 			drawModel(shadow.shadowShader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
 			drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
@@ -361,7 +364,9 @@ int main() {
 				glDisable(GL_CLIP_DISTANCE0);
 				fbos.unbindCurrentFrameBuffer();
 			}
-			
+
+            glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+
 
 			//Render scene
 			//Sky-box
@@ -388,8 +393,14 @@ int main() {
 				model_shader.SetVector4f("plane", glm::vec4(0, -1, 0, waters[0].getHeight()));
 			}
 			// Objects
-			model_shader.Use();
+			// Draw animation models
 			view = camera.GetViewMatrix();
+
+			animations.InitShader(lightSpaceMatrix, 0, 3, glm::vec3(lightValue[0], lightValue[1], lightValue[2]),
+				camera.Position, projection, view);
+
+			model_shader.Use();
+		
 			model_shader.SetMatrix4("view", view);
 			model_shader.SetMatrix4("projection", projection);
 			model_shader.SetVector3f("viewPos", camera.Position);
@@ -405,11 +416,14 @@ int main() {
 			model_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
 			model_shader.SetInteger("shadowMap", 3);
+
 			glActiveTexture(GL_TEXTURE3);
 			glBindTexture(GL_TEXTURE_2D, shadow.depthMap);
 			if (!stage_mode) {
 				world.drawScene(model_shader);
 				world.drawObject(model_shader);
+				
+				animations.Render();
 				drawModel(model_shader, player, player_pos, glm::vec3(0.01f), glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
 				drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
 				drawModel(model_shader, beach, glm::vec3(18.0f, 2.0f, 18.0f), glm::vec3(3.0f));
@@ -456,17 +470,12 @@ int main() {
 				snow.Render(deltaTime, model, view, projection);
 			}
 
-			// Draw animation models
-			animations.InitShader(lightSpaceMatrix, 0, 3, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), camera.Position, projection, view);
-			animations.Render();
-
 			if (i == 0) {
 				camera.Position.y += distance;
 				camera.Pitch = -camera.Pitch;
 			}
 			
 		}
-
         //water
 
         waterRender.render(waters, camera);

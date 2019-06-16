@@ -1,5 +1,7 @@
 #include <animation_system.h>
 
+#include <Shadow.h>
+
 AnimationController::AnimationController() {
 
 }
@@ -15,11 +17,14 @@ void AnimationController::InitController() {
 	this->shader = Shader("../src/shaders/animation/shadow_mapping_dynamic.vs", "../src/shaders/animation/shadow_mapping_dynamic.fs");
 }
 
-void AnimationController::InitShader(glm::mat4 lightSpaceMatrix, unsigned int diffuseTexture, unsigned int shadowMap,
-	glm::vec3 lightPos, glm::vec3 viewPos, glm::mat4 projection, glm::mat4 view) {
-
+void AnimationController::InitDepthShader(glm::mat4 lightSpaceMatrix) {
+	//Shadow map
 	this->depth_shader.Use();
 	this->depth_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+}
+
+void AnimationController::InitShader(glm::mat4 lightSpaceMatrix, unsigned int diffuseTexture, unsigned int shadowMap,
+	glm::vec3 lightPos, glm::vec3 viewPos, glm::mat4 projection, glm::mat4 view) {
 
 	this->shader.Use();
 	this->shader.SetInteger("diffuseTexture", diffuseTexture);
@@ -30,11 +35,13 @@ void AnimationController::InitShader(glm::mat4 lightSpaceMatrix, unsigned int di
 	this->shader.SetMatrix4("view", view);
 }
 
-void AnimationController::Render() {
+void AnimationController::RenderDepth() {
 	for(auto ele : this->animation_models) {
 		ele->Draw(this->depth_shader);
 	}
+}
 
+void AnimationController::Render() {
 	for (auto ele : this->animation_models) {
 		ele->Draw(this->shader);
 	}
