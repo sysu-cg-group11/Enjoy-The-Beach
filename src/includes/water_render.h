@@ -24,10 +24,18 @@ public:
 
 class WaterFrameBuffers {
 private:
-	const int REFLECTION_WIDTH = 1280,
+    //Issues with retina display
+#ifdef __APPLE__
+	const int REFLECTION_WIDTH = 2560,
+		REFLECTION_HEIGHT = 1440,
+		REFRACTION_WIDTH = 2560,
+		REFRACTION_HEIGHT = 1440;
+#else
+    const int REFLECTION_WIDTH = 1280,
 		REFLECTION_HEIGHT = 720,
 		REFRACTION_WIDTH = 1280,
 		REFRACTION_HEIGHT = 720;
+#endif
 	//reflection
 	GLuint reflectionFrameBuffer;
 	GLuint reflectionTexture;

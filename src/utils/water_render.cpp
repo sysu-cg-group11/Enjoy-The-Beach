@@ -58,7 +58,12 @@ void WaterFrameBuffers::bindReflectionFrameBuffer(int width, int height) {
 
 void WaterFrameBuffers::unbindCurrentFrameBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //Issues with retina display
+#ifdef __APPLE__
+    glViewport(0, 0, 2560, 1440);
+#else
     glViewport(0, 0, 1280, 720);
+#endif
 }
 
 int WaterFrameBuffers::getReflectionTexture() {

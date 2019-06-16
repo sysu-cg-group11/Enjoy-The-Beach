@@ -361,9 +361,7 @@ int main() {
 				glDisable(GL_CLIP_DISTANCE0);
 				fbos.unbindCurrentFrameBuffer();
 			}
-
-            glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
-
+			
 
 			//Render scene
 			//Sky-box
