@@ -353,6 +353,10 @@ int main() {
 			drawModel(shadow.shadowShader, lightFish, glm::vec3(28.0f, -3.0f, -12.0f), glm::vec3(1.5f), glm::vec3(0.0f, 180.0f, 0.0f));
 			drawModel(shadow.shadowShader, crocodile, glm::vec3(-22.0f, -0.5f, 15.0f), glm::vec3(0.005f), glm::vec3(0.0f, 140.0f, 0.0f));
 
+			drawModel(shadow.shadowShader, dolphin, glm::vec3(35.0f, -2.0f, -35.0f), glm::vec3(0.5f), glm::vec3(glfwGetTime(), 0.0f, 0.0f));
+			drawModel(shadow.shadowShader, narwhal, glm::vec3(0.0f, -1.0f, -25.0f), glm::vec3(1.0f), glm::vec3(0.0f, 80.0f, 0.0f));
+			drawModel(shadow.shadowShader, shark, glm::vec3(shark_x, -1.5f, shark_y), glm::vec3(2.0f), glm::vec3(0.0f), glm::vec3(0.0f, shark_angle, 0.0f));
+
             if (have_snowman < 2) {
                 drawModel(shadow.shadowShader, snowMan,
                           glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.2f,
