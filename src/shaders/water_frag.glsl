@@ -19,6 +19,7 @@ uniform float moveFactor;
 const float waveStrength = 0.04;
 const float shineDamper = 20.0;
 const float reflectivity = 0.7;
+
 void main()
 {
 	vec2 ndc = (clipSpace.xy / clipSpace.w) / 2.0 + 0.5;
@@ -55,7 +56,7 @@ void main()
 	vec3 viewVector = normalize(toCameraVector);
 	float refractiveFactor = dot(viewVector, normal);
 	refractiveFactor = pow(refractiveFactor, 0.8);
-	refractiveFactor = clamp(refractiveFactor, 0.0, 1.0);
+	refractiveFactor = clamp(refractiveFactor, 0.001, 0.999);
 
 	vec3 reflectedLight = reflect(normalize(fromLightVector), normal);
 	float specular = max(dot(reflectedLight, viewVector), 0.0);

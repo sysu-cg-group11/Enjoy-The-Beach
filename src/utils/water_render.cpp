@@ -144,8 +144,8 @@ WaterRender::WaterRender(WaterShader *shader, glm::mat4 projectionMatrix, WaterF
     setUpVAO();
 }
 
-void WaterRender::render(std::vector<WaterTile> water, Camera camera) {
-    prepareRender(camera);
+void WaterRender::render(std::vector<WaterTile> water, Camera camera, float speed) {
+    prepareRender(camera, speed);
     for (auto tile : water) {
         glm::mat4 modelMatrix(1.0f);
         modelMatrix = glm::translate(modelMatrix, glm::vec3(tile.getX(), tile.getHeight(), tile.getZ()));
@@ -171,11 +171,11 @@ void WaterRender::clean() {
     glDeleteBuffers(1, &quad);
 }
 
-void WaterRender::prepareRender(Camera camera) {
+void WaterRender::prepareRender(Camera camera, float speed) {
     (*shader).Use();
     (*shader).loadViewMatrix(camera.GetViewMatrix());
     (*shader).SetVector3f("cameraPosition", camera.Position);
-    moveFactor += WAVE_SPEED * 0.017;
+    moveFactor += WAVE_SPEED * speed;
     if (moveFactor > 1) {
         moveFactor -= floor(moveFactor);
     }

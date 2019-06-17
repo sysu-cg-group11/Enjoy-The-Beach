@@ -76,32 +76,52 @@ float shark_x = 0.0f, shark_y = 0.0f, shark_radius = 65.0f;
 float prev_shark_x = 0.0f, prev_shark_y = 0.0f, shark_angle = 0.0f;
 
 unsigned int cubemapTexture;
+unsigned int cubemapTexture2;
 
 vector<glm::vec2> snow_elements_pos;
 vector<glm::vec3> fire_elements_pos;
 
-std::vector<std::string> hot_faces
-        {
-                "../resources/textures/skybox/sky-hot.jpg",
-                "../resources/textures/skybox/sky-hot.jpg",
-                "../resources/textures/skybox/hot-top.jpg",
-                "../resources/textures/skybox/hot-bottom.jpg",
-                "../resources/textures/skybox/sky-hot.jpg",
-                "../resources/textures/skybox/sky-hot.jpg"
-        };
+std::vector<std::string> faces{
+	"../resources/textures/skybox/right.jpg",
+	"../resources/textures/skybox/left.jpg",
+	"../resources/textures/skybox/top.jpg",
+	"../resources/textures/skybox/bottom.jpg",
+	"../resources/textures/skybox/back.jpg",
+	"../resources/textures/skybox/front.jpg"
+};
 
-std::vector<std::string> cold_faces
-        {
-                "../resources/textures/skybox/sky-cold.jpg",
-                "../resources/textures/skybox/sky-cold.jpg",
-                "../resources/textures/skybox/cold-top.jpg",
-                "../resources/textures/skybox/cold-bottom.jpg",
-                "../resources/textures/skybox/sky-cold.jpg",
-                "../resources/textures/skybox/sky-cold.jpg"
-        };
+std::vector<std::string> night_faces{
+	"../resources/textures/nightSky/right.jpg",
+	"../resources/textures/nightSky/left.jpg",
+	"../resources/textures/nightSky/top.jpg",
+	"../resources/textures/nightSky/bottom.jpg",
+	"../resources/textures/nightSky/back.jpg",
+	"../resources/textures/nightSky/front.jpg"
+};
+
+std::vector<std::string> hot_faces{
+    "../resources/textures/skybox/sky-hot.jpg",
+    "../resources/textures/skybox/sky-hot.jpg",
+	"../resources/textures/skybox/hot-top.jpg",
+	"../resources/textures/skybox/hot-bottom.jpg",
+	"../resources/textures/skybox/sky-hot.jpg",
+	"../resources/textures/skybox/sky-hot.jpg"
+};
+
+std::vector<std::string> cold_faces{
+	"../resources/textures/skybox/sky-cold.jpg",
+	"../resources/textures/skybox/sky-cold.jpg",
+	"../resources/textures/skybox/cold-top.jpg",
+	"../resources/textures/skybox/cold-bottom.jpg",
+	"../resources/textures/skybox/sky-cold.jpg",
+	"../resources/textures/skybox/sky-cold.jpg"
+};
 
 const char *glsl_version = "#version 330";
 
+const float ROTATE_SPEED = 0.55f;
+float rotation = 0;
+float timeing = 0;
 
 int main() {
     // glfw: initialize and configure
@@ -192,14 +212,12 @@ int main() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
 
-    if (stage_mode) {
-        cubemapTexture = CubeRender::loadCubemap(cold_faces);
-    } else {
-        cubemapTexture = CubeRender::loadCubemap(hot_faces);
-    }
+    cubemapTexture = CubeRender::loadCubemap(faces);
+	cubemapTexture2 = CubeRender::loadCubemap(night_faces);
 
     shader.Use();
-    shader.SetInteger("skybox", 0);
+	shader.SetInteger("skybox", 0);
+	shader.SetInteger("skybox2", 1);
 
     // Load all .obj models
     Model sun("../resources/sun/Sun_01.obj");
@@ -257,6 +275,33 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+		//Calculating day & night
+		timeing += deltaTime * 1000;
+		timeing = fmod(timeing, 24000);
+		int texture1;
+		int texture2;
+		float blendFactor;
+		if (timeing >= 0 && timeing < 5000) {
+			texture1 = cubemapTexture2;
+			texture2 = cubemapTexture2;
+			blendFactor = (timeing - 0) / float((5000 - 0));
+		}
+		else if (timeing >= 5000 && timeing < 8000) {
+			texture1 = cubemapTexture2;
+			texture2 = cubemapTexture;
+			blendFactor = (timeing - 5000) / float((8000 - 5000));
+		}
+		else if (timeing >= 8000 && timeing < 21000) {
+			texture1 = cubemapTexture;
+			texture2 = cubemapTexture;
+			blendFactor = (timeing - 8000) / float((21000 - 8000));
+		}
+		else {
+			texture1 = cubemapTexture;
+			texture2 = cubemapTexture2;
+			blendFactor = (timeing - 21000) / float((24000 - 21000));
+		}
+
 		// Calculating frames && locations
         if (snowman_frame == 100)
             dir = -1.0f;
@@ -287,7 +332,7 @@ int main() {
         processInput(window);
         checkCollision();
 
-        glClearColor(1.0, 1.0, 1.0, 1.0);
+        glClearColor(0.5, 0.5, 0.5, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         static int mode = 0;
@@ -406,7 +451,7 @@ int main() {
         }
 
         shadow.unbind(prevViewport);
-
+		water_shader.SetVector3f("skyColour", glm::vec3(0.5, 0.5, 0.5));
         glGetIntegerv(GL_VIEWPORT, prevViewport.data());
         for (int i = 0; i < 3; ++i) {
             glEnable(GL_CLIP_DISTANCE0);
@@ -434,12 +479,19 @@ int main() {
             glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
             view = glm::mat4(temp);
             shader.Use();
-            shader.SetMatrix4("view", view);
+			glm::mat4 tmp = view;
+			rotation += ROTATE_SPEED * deltaTime;
+			tmp[3] = glm::vec4(0.0);
+			tmp = glm::rotate(tmp, glm::radians(rotation), glm::vec3(0.0, 1.0, 0.0));
+            shader.SetMatrix4("view", tmp);
             shader.SetMatrix4("projection", projection);
+			shader.SetFloat("blendFactor", blendFactor);
 
             glBindVertexArray(skyboxVAO);
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, texture1);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, texture2);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
             glBindVertexArray(0);
@@ -460,6 +512,7 @@ int main() {
 
             model_shader.Use();
 
+			model_shader.SetVector3f("skyColour", glm::vec3(0.5, 0.5, 0.5));
             model_shader.SetInteger("gammaMode", GAMMA_MODE);
             model_shader.SetMatrix4("view", view);
             model_shader.SetMatrix4("projection", projection);
@@ -563,7 +616,7 @@ int main() {
         }
         //water
 
-        waterRender.render(waters, camera);
+        waterRender.render(waters, camera, deltaTime);
 
         //Render text
         glEnable(GL_BLEND);
@@ -754,7 +807,8 @@ void checkCollision() {
             current_hot_index = 0;
             have_penguin = 0;
             have_snowman = 0;
-            cubemapTexture = CubeRender::loadCubemap(cold_faces);
+            cubemapTexture = CubeRender::loadCubemap(faces);
+			cubemapTexture2 = CubeRender::loadCubemap(night_faces);
         }
     }
     // Check mountain objects collision

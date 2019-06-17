@@ -95,13 +95,13 @@ private:
 public:
     WaterRender(WaterShader *shader, glm::mat4 projectionMatrix, WaterFrameBuffers *fbos, float lightPos[3]);
 
-    void render(std::vector<WaterTile> water, Camera camera);
+    void render(std::vector<WaterTile> water, Camera camera, float speed);
 
     void unbind();
 
     void clean();
 
-    void prepareRender(Camera camera);
+    void prepareRender(Camera camera, float speed);
 
     void setUpVAO();
 };
