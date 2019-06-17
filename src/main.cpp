@@ -238,6 +238,8 @@ int main() {
     Model umbrella3("../resources/umbrella3/model.obj");
     
 	Model coconut("../resources/coconut/Coconut.obj");
+	Model coconut1("../resources/coconut/model.obj");
+
 	Model coconut_tree1("../resources/coconut_tree/palm_tree_02.obj");
 	Model coconut_tree2("../resources/coconut_tree/PalmyraPalmTree.obj");
 	Model coconut_tree3("../resources/coconut_tree/PUSHILIN_palm_tree.obj");
@@ -425,7 +427,8 @@ int main() {
             drawModel(shadow.shadowShader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
             drawModel(shadow.shadowShader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
 
-			drawModel(shadow.shadowShader, coconut, glm::vec3(-9.0f, -1.8f, -10.0f), glm::vec3(0.000005f));
+			drawModel(shadow.shadowShader, coconut, glm::vec3(0.0f, 1.0f, -15.0f), glm::vec3(0.5f));
+			drawModel(shadow.shadowShader, coconut1, glm::vec3(-3.0f, 1.0f, 15.0f), glm::vec3(10.0f));
 
 			drawModel(shadow.shadowShader, coconut_tree1, glm::vec3(10.0f, 0.0f, 11.0f), glm::vec3(0.05f));
 			drawModel(shadow.shadowShader, coconut_tree1, glm::vec3(15.0f, 0.0f, -15.0f), glm::vec3(0.05f), glm::vec3(0.0f, 180.0f, 0.0f));
@@ -577,7 +580,8 @@ int main() {
                 drawModel(model_shader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
                 drawModel(model_shader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
 
-                drawModel(model_shader, coconut, glm::vec3(-9.0f, -1.8f, -10.0f), glm::vec3(0.000005f));
+                drawModel(model_shader, coconut, glm::vec3(0.0f, 1.0f, -15.0f), glm::vec3(0.5f));
+				drawModel(model_shader, coconut1, glm::vec3(-3.0f, 1.0f, 15.0f), glm::vec3(10.0f));
 
 				drawModel(model_shader, coconut_tree1, glm::vec3(10.0f, 0.0f, 11.0f), glm::vec3(0.05f));
 				drawModel(model_shader, coconut_tree1, glm::vec3(15.0f, 0.0f, -15.0f), glm::vec3(0.05f), glm::vec3(0.0f, 180.0f, 0.0f));
