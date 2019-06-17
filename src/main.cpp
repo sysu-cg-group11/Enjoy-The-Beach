@@ -72,6 +72,9 @@ enum GammaMode {
 bool stage_mode = false, view_mode = false;
 bool player_dirs[4] = {false, false, false, false};
 
+float shark_x = 0.0f, shark_y = 0.0f, shark_radius = 65.0f;
+float prev_shark_x = 0.0f, prev_shark_y = 0.0f, shark_angle = 0.0f;
+
 unsigned int cubemapTexture;
 
 vector<glm::vec2> snow_elements_pos;
@@ -203,13 +206,24 @@ int main() {
     Model beach("../resources/beach/model.obj");
     Model player("../resources/birds/bird2/NOVELO_PARROT.obj");
     Model seagull("../resources/seagull/Flying gull Texture 2.obj");
+	Model lightFish("../resources/fishes/model.obj");
+	Model crocodile("../resources/fishes/Crocodile_01.obj");
+	Model dolphin("../resources/fishes/Dolphin_01.obj");
+	Model narwhal("../resources/fishes/Narwhal.obj");
+	Model shark("../resources/fishes/shark.obj");
+
     Model snowMan("../resources/snowman/model.obj");
     Model chair1("../resources/chair1/Beach Chair .obj");
     Model chair2("../resources/chair2/Beach Chairs and Umbrella.obj");
     Model umbrella1("../resources/umbrella1/model.obj");
     Model umbrella2("../resources/umbrella2/model.obj");
     Model umbrella3("../resources/umbrella3/model.obj");
-    Model seashell("../resources/seashell/seaShell2.obj");
+    
+	Model coconut("../resources/coconut/Coconut.obj");
+	Model coconut_tree1("../resources/coconut_tree/palm_tree_02.obj");
+	Model coconut_tree2("../resources/coconut_tree/PalmyraPalmTree.obj");
+	Model coconut_tree3("../resources/coconut_tree/PUSHILIN_palm_tree.obj");
+
     Model penguin("../resources/penguin/Mesh_Penguin.obj");
     Model volcano("../resources/volcano/Volcano.obj");
 
@@ -243,6 +257,7 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+		// Calculating frames && locations
         if (snowman_frame == 100)
             dir = -1.0f;
         else if (snowman_frame == 0)
@@ -254,6 +269,19 @@ int main() {
         player_pos = glm::vec3(camera.Position.x + (view_mode ? 0.5 : 6) * camera.Front.x,
                                camera.Position.y + (view_mode ? 0.5 : 6) * camera.Front.y,
                                camera.Position.z + (view_mode ? 0.5 : 6) * camera.Front.z);
+		float currentTime = glfwGetTime();
+		shark_x = sin(currentTime / 10.0f) * shark_radius;
+		shark_y = cos(currentTime / 10.0f) * shark_radius;
+
+		int shark_x_mode = shark_x > 30 ? 0 : ((shark_x < -30) ? 1 : 2),
+			shark_prev_x_mode = prev_shark_x > 30 ? 0 : ((prev_shark_x < -30) ? 1 : 2),
+			shark_y_mode = shark_y > 30 ? 0 : ((shark_y < -30) ? 1 : 2),
+			shark_prev_y_mode = prev_shark_y > 30 ? 0 : ((prev_shark_y < -30) ? 1 : 2);
+
+		if (shark_x_mode != shark_prev_x_mode || shark_y_mode != shark_prev_y_mode)
+			shark_angle += 45.0f;
+
+		prev_shark_x = shark_x;  prev_shark_y = shark_y;
 
         // input
         processInput(window);
@@ -309,7 +337,7 @@ int main() {
             //Draw scene from light's perspective
             shadow.shadowShader.SetInteger("useOffset", true);
             world.drawScene(shadow.shadowShader);
-            world.drawObject(shadow.shadowShader);
+            //world.drawObject(shadow.shadowShader);
             shadow.shadowShader.SetInteger("useOffset", false);
 
             animations.RenderDepth();
@@ -319,6 +347,12 @@ int main() {
             drawModel(shadow.shadowShader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
             drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f),
                       glm::vec3(0.0f, 180.0f, 0.0f));
+
+			drawModel(shadow.shadowShader, lightFish, glm::vec3(30.0f, -1.0f, 0.0f), glm::vec3(1.5f));
+			drawModel(shadow.shadowShader, lightFish, glm::vec3(35.0f, -2.0f, -8.0f), glm::vec3(1.5f), glm::vec3(0.0f, 45.0f, 0.0f));
+			drawModel(shadow.shadowShader, lightFish, glm::vec3(28.0f, -3.0f, -12.0f), glm::vec3(1.5f), glm::vec3(0.0f, 180.0f, 0.0f));
+			drawModel(shadow.shadowShader, crocodile, glm::vec3(-22.0f, -0.5f, 15.0f), glm::vec3(0.005f), glm::vec3(0.0f, 140.0f, 0.0f));
+
             if (have_snowman < 2) {
                 drawModel(shadow.shadowShader, snowMan,
                           glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.2f,
@@ -342,7 +376,12 @@ int main() {
             drawModel(shadow.shadowShader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
             drawModel(shadow.shadowShader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
 
-            drawModel(shadow.shadowShader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
+			drawModel(shadow.shadowShader, coconut, glm::vec3(-9.0f, -1.8f, -10.0f), glm::vec3(0.000005f));
+
+			drawModel(shadow.shadowShader, coconut_tree1, glm::vec3(10.0f, 0.0f, 11.0f), glm::vec3(0.05f));
+			drawModel(shadow.shadowShader, coconut_tree1, glm::vec3(15.0f, 0.0f, -15.0f), glm::vec3(0.05f), glm::vec3(0.0f, 180.0f, 0.0f));
+			drawModel(shadow.shadowShader, coconut_tree2, glm::vec3(-17.0f, 0.0f, 14.0f), glm::vec3(0.5f));
+			drawModel(shadow.shadowShader, coconut_tree2, glm::vec3(-17.0f, 0.0f, -14.0f), glm::vec3(0.5f));
 
             drawModel(shadow.shadowShader, volcano, glm::vec3(-30.0f, -1.0f, -30.0f), glm::vec3(1.0f));
         } else {
@@ -438,7 +477,7 @@ int main() {
             glBindTexture(GL_TEXTURE_2D, shadow.depthMap);
             if (!stage_mode) {
                 world.drawScene(model_shader);
-                world.drawObject(model_shader);
+                //world.drawObject(model_shader);
 
                 animations.Render();
                 drawModel(model_shader, player, player_pos, glm::vec3(0.01f),
@@ -448,6 +487,16 @@ int main() {
                 drawModel(model_shader, seagull, glm::vec3(0.0f, 8.0f, 0.0f), glm::vec3(0.02f));
                 drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f),
                           glm::vec3(0.0f, 180.0f, 0.0f));
+
+				drawModel(model_shader, lightFish, glm::vec3(30.0f, -1.0f, 0.0f), glm::vec3(1.5f));
+				drawModel(model_shader, lightFish, glm::vec3(35.0f, -2.0f, -8.0f), glm::vec3(1.5f), glm::vec3(0.0f, 45.0f, 0.0f));
+				drawModel(model_shader, lightFish, glm::vec3(28.0f, -3.0f, -12.0f), glm::vec3(1.5f), glm::vec3(0.0f, 180.0f, 0.0f));
+				drawModel(model_shader, crocodile, glm::vec3(-22.0f, -0.5f, 15.0f), glm::vec3(0.005f), glm::vec3(0.0f, 140.0f, 0.0f));
+
+				drawModel(model_shader, dolphin, glm::vec3(35.0f, -2.0f, -35.0f), glm::vec3(0.5f), glm::vec3(glfwGetTime(), 0.0f, 0.0f));
+				drawModel(model_shader, narwhal, glm::vec3(0.0f, -1.0f, -25.0f), glm::vec3(1.0f), glm::vec3(0.0f, 80.0f, 0.0f));
+				drawModel(model_shader, shark, glm::vec3(shark_x, -1.5f, shark_y), glm::vec3(2.0f), glm::vec3(0.0f), glm::vec3(0.0f, shark_angle, 0.0f));
+
                 if (have_snowman < 2) {
                     drawModel(model_shader, snowMan,
                               glm::vec3(snow_elements_pos[have_snowman].x, snowman_frame * 0.02f + 1.2f,
@@ -471,7 +520,12 @@ int main() {
                 drawModel(model_shader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
                 drawModel(model_shader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
 
-                drawModel(model_shader, seashell, glm::vec3(0.0f, 0.7f, -15.0f), glm::vec3(0.5f));
+                drawModel(model_shader, coconut, glm::vec3(-9.0f, -1.8f, -10.0f), glm::vec3(0.000005f));
+
+				drawModel(model_shader, coconut_tree1, glm::vec3(10.0f, 0.0f, 11.0f), glm::vec3(0.05f));
+				drawModel(model_shader, coconut_tree1, glm::vec3(15.0f, 0.0f, -15.0f), glm::vec3(0.05f), glm::vec3(0.0f, 180.0f, 0.0f));
+				drawModel(model_shader, coconut_tree2, glm::vec3(-17.0f, 0.0f, 14.0f), glm::vec3(0.5f));
+				drawModel(model_shader, coconut_tree2, glm::vec3(-17.0f, 0.0f, -14.0f), glm::vec3(0.5f));
 
                 drawModel(model_shader, volcano, glm::vec3(-30.0f, -1.0f, -30.0f), glm::vec3(1.0f));
             } else {

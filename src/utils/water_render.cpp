@@ -200,7 +200,7 @@ void WaterRender::prepareRender(Camera camera) {
 }
 
 void WaterRender::setUpVAO() {
-    float vertices[12] = {-2, 0, -2, 2, 0, 0, 0, 0, -2, 2, 0, 2};
+    float vertices[12] = {-2.5, 0, -2.5, 2.5, 0, 0, 0, 0, -2.5, 2.5, 0, 2.5};
     dimensions = 2;
     VERTEX_COUNT = 12 / 2;
     glGenVertexArrays(1, &quad);
