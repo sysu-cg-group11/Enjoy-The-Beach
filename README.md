@@ -66,7 +66,9 @@ cmake .. -G "Visual Studio 15 2017 Win64"
 
 4. **Model import & Mesh viewing:**
 
-   通过加载模型来实现两个场景中不同实体的实现。
+   通过加载模型来实现两个场景中不同实体的实现。例如如下的 TARDIS：
+
+   ![](images/tardis.png)
 
 5. **Shadow Mapping:**
 
