@@ -72,6 +72,7 @@ void main()
     vec3 specular = spec * lightColor * specularStrength;
     float shadow = ShadowCalculation(fs_in.FragPosLightSpace, normal, lightDir);
 
+
     if(type == 0) {
         vec4 texColor = texture(diffuseTexture, fs_in.TexCoords);
         if(texColor.a < 0.1)
@@ -87,15 +88,17 @@ void main()
         FragColor = vec4(lighting, 1.0);
     }
     else {
-
         vec3 result = (ambient + (1.0 - shadow) * (diffuse + specular)) * sprite_color;
+        float gamma = 2.2;
         if(type == 1) {
             FragColor = vec4(result, 1.0);
         }
         else {
-            FragColor = vec4(result, 1.0) * texture(texture_diffuse0, fs_in.TexCoords);
+            vec3 objectColor = texture(texture_diffuse0, fs_in.TexCoords).rgb;
+            if (gammaMode == 0)
+                 objectColor = pow(objectColor, vec3(gamma));
+            FragColor = vec4(result, 1.0) * vec4(objectColor, 1.0);
         }
-        
     }
-
+    
 }

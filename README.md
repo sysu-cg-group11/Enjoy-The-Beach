@@ -52,7 +52,7 @@ cmake .. -G "Visual Studio 15 2017 Win64"
 
    ![](images/light-4.png)
 
-3.  **Texture Mapping: **
+3. **Texture Mapping: **
 
    为模型添加不同的纹理，使模型可显示出更加真实的表面细节：
 
@@ -73,3 +73,31 @@ cmake .. -G "Visual Studio 15 2017 Win64"
    *雪山：*
 
    ![](images/shadow-2.png)
+
+6. Gamma Correction: 
+
+   可通过 OpenGL 内建的方式开启 Gamma Correction, 也可通过着色器启用 Gamma 校正，其效果分别如下：
+
+   未开启 Gamma 校正时：
+
+   ![](images/no-gamma.png)
+
+   使用 OpenGL 内建的`GL_FRAMEBUFFER_SRGB`进行 Gamma 校正效果：
+
+   ![](images/gl-gamma.png)
+
+   在着色器中对纹理进行 Gamma 校正的效果：
+
+   ![](images/shader-gamma.png)
+
+7. 天空盒
+
+8. 字体显示
+
+9. 骨骼动画（沙滩上跑步的人）
+
+10. 粒子系统（雪山场景中的落雪）
+
+11. 流体模拟（场景周围的水，具有流动与倒影的效果）
+
+    
