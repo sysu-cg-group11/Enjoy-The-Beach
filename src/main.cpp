@@ -102,23 +102,7 @@ std::vector<std::string> night_faces{
         "../resources/textures/nightSky/front.jpg"
 };
 
-std::vector<std::string> hot_faces{
-        "../resources/textures/skybox/sky-hot.jpg",
-        "../resources/textures/skybox/sky-hot.jpg",
-        "../resources/textures/skybox/hot-top.jpg",
-        "../resources/textures/skybox/hot-bottom.jpg",
-        "../resources/textures/skybox/sky-hot.jpg",
-        "../resources/textures/skybox/sky-hot.jpg"
-};
 
-std::vector<std::string> cold_faces{
-        "../resources/textures/skybox/sky-cold.jpg",
-        "../resources/textures/skybox/sky-cold.jpg",
-        "../resources/textures/skybox/cold-top.jpg",
-        "../resources/textures/skybox/cold-bottom.jpg",
-        "../resources/textures/skybox/sky-cold.jpg",
-        "../resources/textures/skybox/sky-cold.jpg"
-};
 
 const char *glsl_version = "#version 330";
 
@@ -898,7 +882,8 @@ void checkCollision() {
             current_cold_index = 0;
             have_fire = 0;
             have_cactus = 0;
-            cubemapTexture = CubeRender::loadCubemap(hot_faces);
+            cubemapTexture = CubeRender::loadCubemap(faces);
+			cubemapTexture2 = CubeRender::loadCubemap(night_faces);
         } else {
             camera.Position -= camera.Front;
         }
