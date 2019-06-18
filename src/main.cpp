@@ -77,6 +77,7 @@ float prev_shark_x = 0.0f, prev_shark_y = 0.0f, shark_angle = 0.0f;
 
 unsigned int cubemapTexture;
 unsigned int cubemapTexture2;
+float current_speed = camera.MovementSpeed, speed_improve = 0.05f;
 
 vector<glm::vec2> snow_elements_pos;
 vector<glm::vec3> fire_elements_pos;
@@ -336,7 +337,6 @@ int main() {
         ImGui::Begin("Beach\n");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                     ImGui::GetIO().Framerate);
-        ImGui::Text("%.3f", deltaTime);
         ImGui::End();
 
         glm::mat3 temp(camera.GetViewMatrix());
@@ -649,19 +649,24 @@ int main() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
         if (stage_mode) {
-            render.RenderText("Enjoy The Snow Mountain", header,
+            render.RenderText("Enjoy The Snow Mountain", header-glm::vec2(20.0f, 0.0f),
                               1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-            render.RenderText("Fire: " + to_string(have_fire), glm::vec2(SCR_WIDTH / 2 + 380, SCR_HEIGHT - 60),
+            render.RenderText("Fire: " + to_string(have_fire), glm::vec2(SCR_WIDTH / 2 + 330, SCR_HEIGHT - 60),
                               0.5f, glm::vec3(1.0f));
-            render.RenderText("Cactus: " + to_string(have_cactus), glm::vec2(SCR_WIDTH / 2 + 380, SCR_HEIGHT - 90),
+            render.RenderText("Cactus: " + to_string(have_cactus), glm::vec2(SCR_WIDTH / 2 + 330, SCR_HEIGHT - 90),
                               0.5f, glm::vec3(1.0f));
-        } else {
+			render.RenderText("Speed: " + to_string(current_speed).substr(0, 4), glm::vec2(SCR_WIDTH / 2 + 460, SCR_HEIGHT - 75),
+				0.5f, glm::vec3(1.0f));
+        } 
+		else {
             render.RenderText("Enjoy The Beach", header,
                               1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-            render.RenderText("SnowMan: " + to_string(have_snowman), glm::vec2(SCR_WIDTH / 2 + 330, SCR_HEIGHT - 60),
+            render.RenderText("SnowMan: " + to_string(have_snowman), glm::vec2(SCR_WIDTH / 2 + 280, SCR_HEIGHT - 60),
                               0.5f, glm::vec3(1.0f));
-            render.RenderText("Penguin: " + to_string(have_penguin), glm::vec2(SCR_WIDTH / 2 + 330, SCR_HEIGHT - 90),
+            render.RenderText("Penguin: " + to_string(have_penguin), glm::vec2(SCR_WIDTH / 2 + 280, SCR_HEIGHT - 90),
                               0.5f, glm::vec3(1.0f));
+			render.RenderText("Speed: " + to_string(current_speed).substr(0, 4), glm::vec2(SCR_WIDTH / 2 + 450, SCR_HEIGHT - 75),
+				0.5f, glm::vec3(1.0f));
         }
 
         // render
@@ -781,7 +786,13 @@ void processInput(GLFWwindow *window) {
         player_dirs[3] = false;
     }
 
-
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		current_speed += speed_improve;
+	}
+	else if(current_speed > 8.0f) {
+		current_speed -= speed_improve;
+	}
+	camera.MovementSpeed = current_speed;
 }
 
 //window size changed
