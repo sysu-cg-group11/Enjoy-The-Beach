@@ -129,13 +129,15 @@ int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     //Anti-aliasing
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_SAMPLES, 8);
 
 #ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
 
@@ -252,6 +254,8 @@ int main() {
     Model fire("../resources/fires/PUSHILIN_campfire.obj");
     Model cactus("../resources/fires/PUSHILIN_cactus.obj");
 
+    Model timeAndRelativeDimensionInSpace("../resources/tardis/TARDIS.obj");
+
     auto &world = WorldRender::getInstance();
 
     snow_elements_pos.push_back(glm::vec2(10.0f, 10.0f));
@@ -267,11 +271,12 @@ int main() {
     AnimationController animations;
     animations.InitController();
 
+    //Anti-aliasing
+    glEnable(GL_MULTISAMPLE);
+
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // render loop
     while (!glfwWindowShouldClose(window)) {
-        //Anti-aliasing
-        glEnable(GL_MULTISAMPLE);
 
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -436,6 +441,9 @@ int main() {
 			drawModel(shadow.shadowShader, coconut_tree2, glm::vec3(-17.0f, 0.0f, -14.0f), glm::vec3(0.5f));
 
             drawModel(shadow.shadowShader, volcano, glm::vec3(-30.0f, -1.0f, -30.0f), glm::vec3(1.0f));
+
+            drawModel(shadow.shadowShader, timeAndRelativeDimensionInSpace, glm::vec3(-15, 0, 0), glm::vec3(0.03), glm::vec3(0.0f, 0.5f * M_PI, 0.0f));
+
         } else {
             drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f),
                       glm::vec3(0.3f, 1.5f + h_offset, v_offset), player_angle);
@@ -451,6 +459,8 @@ int main() {
                           glm::vec3(fire_elements_pos[have_cactus + 2].x, fire_elements_pos[have_cactus + 2].y,
                                     fire_elements_pos[have_cactus + 2].z), glm::vec3(2.0f));
             }
+            drawModel(shadow.shadowShader, timeAndRelativeDimensionInSpace, glm::vec3(70, 10, 66), glm::vec3(0.03), glm::vec3(0.0f, -0.5 * M_PI, 0.0f));
+
         }
 
         shadow.unbind(prevViewport);
@@ -589,6 +599,11 @@ int main() {
 				drawModel(model_shader, coconut_tree2, glm::vec3(-17.0f, 0.0f, -14.0f), glm::vec3(0.5f));
 
                 drawModel(model_shader, volcano, glm::vec3(-30.0f, -1.0f, -30.0f), glm::vec3(1.0f));
+
+                model_shader.SetInteger("gammaMode", NoGamma);
+                drawModel(model_shader, timeAndRelativeDimensionInSpace, glm::vec3(-15, 0, 0), glm::vec3(0.03), glm::vec3(0.0f, 0.5f * M_PI, 0.0f));
+                model_shader.SetInteger("gammaMode", GAMMA_MODE);
+
             } else {
                 drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
                 drawModel(model_shader, snowMountain, glm::vec3(0.0f), glm::vec3(10.0f));
@@ -603,6 +618,10 @@ int main() {
                               glm::vec3(fire_elements_pos[have_cactus + 2].x, fire_elements_pos[have_cactus + 2].y,
                                         fire_elements_pos[have_cactus + 2].z), glm::vec3(2.0f));
                 }
+
+                model_shader.SetInteger("gammaMode", NoGamma);
+                drawModel(model_shader, timeAndRelativeDimensionInSpace, glm::vec3(70, 10, 66), glm::vec3(0.03), glm::vec3(0.0f, -0.5 * M_PI, 0.0f));
+                model_shader.SetInteger("gammaMode", GAMMA_MODE);
             }
 
             if (scene_mode == 1) {
