@@ -81,40 +81,43 @@ unsigned int cubemapTexture2;
 vector<glm::vec2> snow_elements_pos;
 vector<glm::vec3> fire_elements_pos;
 
+const glm::vec3 beach_tardis_pos = glm::vec3(-15, 0, 0);
+const glm::vec3 mountain_tardis_pos = glm::vec3(70, 10, 66);
+
 std::vector<std::string> faces{
-	"../resources/textures/skybox/right.jpg",
-	"../resources/textures/skybox/left.jpg",
-	"../resources/textures/skybox/top.jpg",
-	"../resources/textures/skybox/bottom.jpg",
-	"../resources/textures/skybox/back.jpg",
-	"../resources/textures/skybox/front.jpg"
+        "../resources/textures/skybox/right.jpg",
+        "../resources/textures/skybox/left.jpg",
+        "../resources/textures/skybox/top.jpg",
+        "../resources/textures/skybox/bottom.jpg",
+        "../resources/textures/skybox/back.jpg",
+        "../resources/textures/skybox/front.jpg"
 };
 
 std::vector<std::string> night_faces{
-	"../resources/textures/nightSky/right.jpg",
-	"../resources/textures/nightSky/left.jpg",
-	"../resources/textures/nightSky/top.jpg",
-	"../resources/textures/nightSky/bottom.jpg",
-	"../resources/textures/nightSky/back.jpg",
-	"../resources/textures/nightSky/front.jpg"
+        "../resources/textures/nightSky/right.jpg",
+        "../resources/textures/nightSky/left.jpg",
+        "../resources/textures/nightSky/top.jpg",
+        "../resources/textures/nightSky/bottom.jpg",
+        "../resources/textures/nightSky/back.jpg",
+        "../resources/textures/nightSky/front.jpg"
 };
 
 std::vector<std::string> hot_faces{
-    "../resources/textures/skybox/sky-hot.jpg",
-    "../resources/textures/skybox/sky-hot.jpg",
-	"../resources/textures/skybox/hot-top.jpg",
-	"../resources/textures/skybox/hot-bottom.jpg",
-	"../resources/textures/skybox/sky-hot.jpg",
-	"../resources/textures/skybox/sky-hot.jpg"
+        "../resources/textures/skybox/sky-hot.jpg",
+        "../resources/textures/skybox/sky-hot.jpg",
+        "../resources/textures/skybox/hot-top.jpg",
+        "../resources/textures/skybox/hot-bottom.jpg",
+        "../resources/textures/skybox/sky-hot.jpg",
+        "../resources/textures/skybox/sky-hot.jpg"
 };
 
 std::vector<std::string> cold_faces{
-	"../resources/textures/skybox/sky-cold.jpg",
-	"../resources/textures/skybox/sky-cold.jpg",
-	"../resources/textures/skybox/cold-top.jpg",
-	"../resources/textures/skybox/cold-bottom.jpg",
-	"../resources/textures/skybox/sky-cold.jpg",
-	"../resources/textures/skybox/sky-cold.jpg"
+        "../resources/textures/skybox/sky-cold.jpg",
+        "../resources/textures/skybox/sky-cold.jpg",
+        "../resources/textures/skybox/cold-top.jpg",
+        "../resources/textures/skybox/cold-bottom.jpg",
+        "../resources/textures/skybox/sky-cold.jpg",
+        "../resources/textures/skybox/sky-cold.jpg"
 };
 
 const char *glsl_version = "#version 330";
@@ -215,22 +218,22 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
 
     cubemapTexture = CubeRender::loadCubemap(faces);
-	cubemapTexture2 = CubeRender::loadCubemap(night_faces);
+    cubemapTexture2 = CubeRender::loadCubemap(night_faces);
 
     shader.Use();
-	shader.SetInteger("skybox", 0);
-	shader.SetInteger("skybox2", 1);
+    shader.SetInteger("skybox", 0);
+    shader.SetInteger("skybox2", 1);
 
     // Load all .obj models
     Model sun("../resources/sun/Sun_01.obj");
     Model beach("../resources/beach/model.obj");
     Model player("../resources/birds/bird2/NOVELO_PARROT.obj");
     Model seagull("../resources/seagull/Flying gull Texture 2.obj");
-	Model lightFish("../resources/fishes/model.obj");
-	Model crocodile("../resources/fishes/Crocodile_01.obj");
-	Model dolphin("../resources/fishes/Dolphin_01.obj");
-	Model narwhal("../resources/fishes/Narwhal.obj");
-	Model shark("../resources/fishes/shark.obj");
+    Model lightFish("../resources/fishes/model.obj");
+    Model crocodile("../resources/fishes/Crocodile_01.obj");
+    Model dolphin("../resources/fishes/Dolphin_01.obj");
+    Model narwhal("../resources/fishes/Narwhal.obj");
+    Model shark("../resources/fishes/shark.obj");
 
     Model snowMan("../resources/snowman/model.obj");
     Model chair1("../resources/chair1/Beach Chair .obj");
@@ -238,13 +241,13 @@ int main() {
     Model umbrella1("../resources/umbrella1/model.obj");
     Model umbrella2("../resources/umbrella2/model.obj");
     Model umbrella3("../resources/umbrella3/model.obj");
-    
-	Model coconut("../resources/coconut/Coconut.obj");
-	Model coconut1("../resources/coconut/model.obj");
 
-	Model coconut_tree1("../resources/coconut_tree/palm_tree_02.obj");
-	Model coconut_tree2("../resources/coconut_tree/PalmyraPalmTree.obj");
-	Model coconut_tree3("../resources/coconut_tree/PUSHILIN_palm_tree.obj");
+    Model coconut("../resources/coconut/Coconut.obj");
+    Model coconut1("../resources/coconut/model.obj");
+
+    Model coconut_tree1("../resources/coconut_tree/palm_tree_02.obj");
+    Model coconut_tree2("../resources/coconut_tree/PalmyraPalmTree.obj");
+    Model coconut_tree3("../resources/coconut_tree/PUSHILIN_palm_tree.obj");
 
     Model penguin("../resources/penguin/Mesh_Penguin.obj");
     Model volcano("../resources/volcano/Volcano.obj");
@@ -282,34 +285,31 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-		//Calculating day & night
-		timeing += deltaTime * 1000;
-		timeing = fmod(timeing, 24000);
-		int texture1;
-		int texture2;
-		float blendFactor;
-		if (timeing >= 0 && timeing < 5000) {
-			texture1 = cubemapTexture2;
-			texture2 = cubemapTexture2;
-			blendFactor = (timeing - 0) / float((5000 - 0));
-		}
-		else if (timeing >= 5000 && timeing < 8000) {
-			texture1 = cubemapTexture2;
-			texture2 = cubemapTexture;
-			blendFactor = (timeing - 5000) / float((8000 - 5000));
-		}
-		else if (timeing >= 8000 && timeing < 21000) {
-			texture1 = cubemapTexture;
-			texture2 = cubemapTexture;
-			blendFactor = (timeing - 8000) / float((21000 - 8000));
-		}
-		else {
-			texture1 = cubemapTexture;
-			texture2 = cubemapTexture2;
-			blendFactor = (timeing - 21000) / float((24000 - 21000));
-		}
+        //Calculating day & night
+        timeing += deltaTime * 1000;
+        timeing = fmod(timeing, 24000);
+        int texture1;
+        int texture2;
+        float blendFactor;
+        if (timeing >= 0 && timeing < 5000) {
+            texture1 = cubemapTexture2;
+            texture2 = cubemapTexture2;
+            blendFactor = (timeing - 0) / float((5000 - 0));
+        } else if (timeing >= 5000 && timeing < 8000) {
+            texture1 = cubemapTexture2;
+            texture2 = cubemapTexture;
+            blendFactor = (timeing - 5000) / float((8000 - 5000));
+        } else if (timeing >= 8000 && timeing < 21000) {
+            texture1 = cubemapTexture;
+            texture2 = cubemapTexture;
+            blendFactor = (timeing - 8000) / float((21000 - 8000));
+        } else {
+            texture1 = cubemapTexture;
+            texture2 = cubemapTexture2;
+            blendFactor = (timeing - 21000) / float((24000 - 21000));
+        }
 
-		// Calculating frames && locations
+        // Calculating frames && locations
         if (snowman_frame == 100)
             dir = -1.0f;
         else if (snowman_frame == 0)
@@ -321,19 +321,20 @@ int main() {
         player_pos = glm::vec3(camera.Position.x + (view_mode ? 0.5 : 6) * camera.Front.x,
                                camera.Position.y + (view_mode ? 0.5 : 6) * camera.Front.y,
                                camera.Position.z + (view_mode ? 0.5 : 6) * camera.Front.z);
-		float currentTime = glfwGetTime();
-		shark_x = sin(currentTime / 10.0f) * shark_radius;
-		shark_y = cos(currentTime / 10.0f) * shark_radius;
+        float currentTime = glfwGetTime();
+        shark_x = sin(currentTime / 10.0f) * shark_radius;
+        shark_y = cos(currentTime / 10.0f) * shark_radius;
 
-		int shark_x_mode = shark_x > 30 ? 0 : ((shark_x < -30) ? 1 : 2),
-			shark_prev_x_mode = prev_shark_x > 30 ? 0 : ((prev_shark_x < -30) ? 1 : 2),
-			shark_y_mode = shark_y > 30 ? 0 : ((shark_y < -30) ? 1 : 2),
-			shark_prev_y_mode = prev_shark_y > 30 ? 0 : ((prev_shark_y < -30) ? 1 : 2);
+        int shark_x_mode = shark_x > 30 ? 0 : ((shark_x < -30) ? 1 : 2),
+                shark_prev_x_mode = prev_shark_x > 30 ? 0 : ((prev_shark_x < -30) ? 1 : 2),
+                shark_y_mode = shark_y > 30 ? 0 : ((shark_y < -30) ? 1 : 2),
+                shark_prev_y_mode = prev_shark_y > 30 ? 0 : ((prev_shark_y < -30) ? 1 : 2);
 
-		if (shark_x_mode != shark_prev_x_mode || shark_y_mode != shark_prev_y_mode)
-			shark_angle += 45.0f;
+        if (shark_x_mode != shark_prev_x_mode || shark_y_mode != shark_prev_y_mode)
+            shark_angle += 45.0f;
 
-		prev_shark_x = shark_x;  prev_shark_y = shark_y;
+        prev_shark_x = shark_x;
+        prev_shark_y = shark_y;
 
         // input
         processInput(window);
@@ -400,14 +401,20 @@ int main() {
             drawModel(shadow.shadowShader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f),
                       glm::vec3(0.0f, 180.0f, 0.0f));
 
-			drawModel(shadow.shadowShader, lightFish, glm::vec3(30.0f, -1.0f, 0.0f), glm::vec3(1.5f));
-			drawModel(shadow.shadowShader, lightFish, glm::vec3(35.0f, -2.0f, -8.0f), glm::vec3(1.5f), glm::vec3(0.0f, 45.0f, 0.0f));
-			drawModel(shadow.shadowShader, lightFish, glm::vec3(28.0f, -3.0f, -12.0f), glm::vec3(1.5f), glm::vec3(0.0f, 180.0f, 0.0f));
-			drawModel(shadow.shadowShader, crocodile, glm::vec3(-22.0f, -0.5f, 15.0f), glm::vec3(0.005f), glm::vec3(0.0f, 140.0f, 0.0f));
+            drawModel(shadow.shadowShader, lightFish, glm::vec3(30.0f, -1.0f, 0.0f), glm::vec3(1.5f));
+            drawModel(shadow.shadowShader, lightFish, glm::vec3(35.0f, -2.0f, -8.0f), glm::vec3(1.5f),
+                      glm::vec3(0.0f, 45.0f, 0.0f));
+            drawModel(shadow.shadowShader, lightFish, glm::vec3(28.0f, -3.0f, -12.0f), glm::vec3(1.5f),
+                      glm::vec3(0.0f, 180.0f, 0.0f));
+            drawModel(shadow.shadowShader, crocodile, glm::vec3(-22.0f, -0.5f, 15.0f), glm::vec3(0.005f),
+                      glm::vec3(0.0f, 140.0f, 0.0f));
 
-			drawModel(shadow.shadowShader, dolphin, glm::vec3(35.0f, -2.0f, -35.0f), glm::vec3(0.5f), glm::vec3(glfwGetTime(), 0.0f, 0.0f));
-			drawModel(shadow.shadowShader, narwhal, glm::vec3(0.0f, -1.0f, -25.0f), glm::vec3(1.0f), glm::vec3(0.0f, 80.0f, 0.0f));
-			drawModel(shadow.shadowShader, shark, glm::vec3(shark_x, -1.5f, shark_y), glm::vec3(2.0f), glm::vec3(0.0f), glm::vec3(0.0f, shark_angle, 0.0f));
+            drawModel(shadow.shadowShader, dolphin, glm::vec3(35.0f, -2.0f, -35.0f), glm::vec3(0.5f),
+                      glm::vec3(glfwGetTime(), 0.0f, 0.0f));
+            drawModel(shadow.shadowShader, narwhal, glm::vec3(0.0f, -1.0f, -25.0f), glm::vec3(1.0f),
+                      glm::vec3(0.0f, 80.0f, 0.0f));
+            drawModel(shadow.shadowShader, shark, glm::vec3(shark_x, -1.5f, shark_y), glm::vec3(2.0f), glm::vec3(0.0f),
+                      glm::vec3(0.0f, shark_angle, 0.0f));
 
             if (have_snowman < 2) {
                 drawModel(shadow.shadowShader, snowMan,
@@ -432,17 +439,19 @@ int main() {
             drawModel(shadow.shadowShader, umbrella2, glm::vec3(-2.0f, 3.2f, 13.0f), glm::vec3(10.0f));
             drawModel(shadow.shadowShader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
 
-			drawModel(shadow.shadowShader, coconut, glm::vec3(0.0f, 1.0f, -15.0f), glm::vec3(0.5f));
-			drawModel(shadow.shadowShader, coconut1, glm::vec3(-3.0f, 1.0f, 15.0f), glm::vec3(10.0f));
+            drawModel(shadow.shadowShader, coconut, glm::vec3(0.0f, 1.0f, -15.0f), glm::vec3(0.5f));
+            drawModel(shadow.shadowShader, coconut1, glm::vec3(-3.0f, 1.0f, 15.0f), glm::vec3(10.0f));
 
-			drawModel(shadow.shadowShader, coconut_tree1, glm::vec3(10.0f, 0.0f, 11.0f), glm::vec3(0.05f));
-			drawModel(shadow.shadowShader, coconut_tree1, glm::vec3(15.0f, 0.0f, -15.0f), glm::vec3(0.05f), glm::vec3(0.0f, 180.0f, 0.0f));
-			drawModel(shadow.shadowShader, coconut_tree2, glm::vec3(-17.0f, 0.0f, 14.0f), glm::vec3(0.5f));
-			drawModel(shadow.shadowShader, coconut_tree2, glm::vec3(-17.0f, 0.0f, -14.0f), glm::vec3(0.5f));
+            drawModel(shadow.shadowShader, coconut_tree1, glm::vec3(10.0f, 0.0f, 11.0f), glm::vec3(0.05f));
+            drawModel(shadow.shadowShader, coconut_tree1, glm::vec3(15.0f, 0.0f, -15.0f), glm::vec3(0.05f),
+                      glm::vec3(0.0f, 180.0f, 0.0f));
+            drawModel(shadow.shadowShader, coconut_tree2, glm::vec3(-17.0f, 0.0f, 14.0f), glm::vec3(0.5f));
+            drawModel(shadow.shadowShader, coconut_tree2, glm::vec3(-17.0f, 0.0f, -14.0f), glm::vec3(0.5f));
 
             drawModel(shadow.shadowShader, volcano, glm::vec3(-30.0f, -1.0f, -30.0f), glm::vec3(1.0f));
 
-            drawModel(shadow.shadowShader, timeAndRelativeDimensionInSpace, glm::vec3(-15, 0, 0), glm::vec3(0.03), glm::vec3(0.0f, 0.5f * M_PI, 0.0f));
+            drawModel(shadow.shadowShader, timeAndRelativeDimensionInSpace, beach_tardis_pos, glm::vec3(0.023),
+                      glm::vec3(0.0f, 0.5f * M_PI, 0.0f));
 
         } else {
             drawModel(shadow.shadowShader, player, player_pos, glm::vec3(0.01f),
@@ -459,12 +468,13 @@ int main() {
                           glm::vec3(fire_elements_pos[have_cactus + 2].x, fire_elements_pos[have_cactus + 2].y,
                                     fire_elements_pos[have_cactus + 2].z), glm::vec3(2.0f));
             }
-            drawModel(shadow.shadowShader, timeAndRelativeDimensionInSpace, glm::vec3(70, 10, 66), glm::vec3(0.03), glm::vec3(0.0f, -0.5 * M_PI, 0.0f));
+            drawModel(shadow.shadowShader, timeAndRelativeDimensionInSpace, mountain_tardis_pos, glm::vec3(0.023),
+                      glm::vec3(0.0f, -0.5 * M_PI, 0.0f));
 
         }
 
         shadow.unbind(prevViewport);
-		water_shader.SetVector3f("skyColour", glm::vec3(0.5, 0.5, 0.5));
+        water_shader.SetVector3f("skyColour", glm::vec3(0.5, 0.5, 0.5));
         glGetIntegerv(GL_VIEWPORT, prevViewport.data());
         for (int i = 0; i < 3; ++i) {
             glEnable(GL_CLIP_DISTANCE0);
@@ -492,19 +502,19 @@ int main() {
             glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
             view = glm::mat4(temp);
             shader.Use();
-			glm::mat4 tmp = view;
-			rotation += ROTATE_SPEED * deltaTime;
-			tmp[3] = glm::vec4(0.0);
-			tmp = glm::rotate(tmp, glm::radians(rotation), glm::vec3(0.0, 1.0, 0.0));
+            glm::mat4 tmp = view;
+            rotation += ROTATE_SPEED * deltaTime;
+            tmp[3] = glm::vec4(0.0);
+            tmp = glm::rotate(tmp, glm::radians(rotation), glm::vec3(0.0, 1.0, 0.0));
             shader.SetMatrix4("view", tmp);
             shader.SetMatrix4("projection", projection);
-			shader.SetFloat("blendFactor", blendFactor);
+            shader.SetFloat("blendFactor", blendFactor);
 
             glBindVertexArray(skyboxVAO);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_CUBE_MAP, texture1);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, texture2);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, texture2);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
             glBindVertexArray(0);
@@ -525,7 +535,7 @@ int main() {
 
             model_shader.Use();
 
-			model_shader.SetVector3f("skyColour", glm::vec3(0.5, 0.5, 0.5));
+            model_shader.SetVector3f("skyColour", glm::vec3(0.5, 0.5, 0.5));
             model_shader.SetInteger("gammaMode", GAMMA_MODE);
             model_shader.SetMatrix4("view", view);
             model_shader.SetMatrix4("projection", projection);
@@ -558,14 +568,20 @@ int main() {
                 drawModel(model_shader, seagull, glm::vec3(3.0f, 7.0f, 0.0f), glm::vec3(0.02f),
                           glm::vec3(0.0f, 180.0f, 0.0f));
 
-				drawModel(model_shader, lightFish, glm::vec3(30.0f, -1.0f, 0.0f), glm::vec3(1.5f));
-				drawModel(model_shader, lightFish, glm::vec3(35.0f, -2.0f, -8.0f), glm::vec3(1.5f), glm::vec3(0.0f, 45.0f, 0.0f));
-				drawModel(model_shader, lightFish, glm::vec3(28.0f, -3.0f, -12.0f), glm::vec3(1.5f), glm::vec3(0.0f, 180.0f, 0.0f));
-				drawModel(model_shader, crocodile, glm::vec3(-22.0f, -0.5f, 15.0f), glm::vec3(0.005f), glm::vec3(0.0f, 140.0f, 0.0f));
+                drawModel(model_shader, lightFish, glm::vec3(30.0f, -1.0f, 0.0f), glm::vec3(1.5f));
+                drawModel(model_shader, lightFish, glm::vec3(35.0f, -2.0f, -8.0f), glm::vec3(1.5f),
+                          glm::vec3(0.0f, 45.0f, 0.0f));
+                drawModel(model_shader, lightFish, glm::vec3(28.0f, -3.0f, -12.0f), glm::vec3(1.5f),
+                          glm::vec3(0.0f, 180.0f, 0.0f));
+                drawModel(model_shader, crocodile, glm::vec3(-22.0f, -0.5f, 15.0f), glm::vec3(0.005f),
+                          glm::vec3(0.0f, 140.0f, 0.0f));
 
-				drawModel(model_shader, dolphin, glm::vec3(35.0f, -2.0f, -35.0f), glm::vec3(0.5f), glm::vec3(glfwGetTime(), 0.0f, 0.0f));
-				drawModel(model_shader, narwhal, glm::vec3(0.0f, -1.0f, -25.0f), glm::vec3(1.0f), glm::vec3(0.0f, 80.0f, 0.0f));
-				drawModel(model_shader, shark, glm::vec3(shark_x, -1.5f, shark_y), glm::vec3(2.0f), glm::vec3(0.0f), glm::vec3(0.0f, shark_angle, 0.0f));
+                drawModel(model_shader, dolphin, glm::vec3(35.0f, -2.0f, -35.0f), glm::vec3(0.5f),
+                          glm::vec3(glfwGetTime(), 0.0f, 0.0f));
+                drawModel(model_shader, narwhal, glm::vec3(0.0f, -1.0f, -25.0f), glm::vec3(1.0f),
+                          glm::vec3(0.0f, 80.0f, 0.0f));
+                drawModel(model_shader, shark, glm::vec3(shark_x, -1.5f, shark_y), glm::vec3(2.0f), glm::vec3(0.0f),
+                          glm::vec3(0.0f, shark_angle, 0.0f));
 
                 if (have_snowman < 2) {
                     drawModel(model_shader, snowMan,
@@ -591,17 +607,19 @@ int main() {
                 drawModel(model_shader, umbrella3, glm::vec3(-9.0f, 3.2f, 13.0f), glm::vec3(10.0f));
 
                 drawModel(model_shader, coconut, glm::vec3(0.0f, 1.0f, -15.0f), glm::vec3(0.5f));
-				drawModel(model_shader, coconut1, glm::vec3(-3.0f, 1.0f, 15.0f), glm::vec3(10.0f));
+                drawModel(model_shader, coconut1, glm::vec3(-3.0f, 1.0f, 15.0f), glm::vec3(10.0f));
 
-				drawModel(model_shader, coconut_tree1, glm::vec3(10.0f, 0.0f, 11.0f), glm::vec3(0.05f));
-				drawModel(model_shader, coconut_tree1, glm::vec3(15.0f, 0.0f, -15.0f), glm::vec3(0.05f), glm::vec3(0.0f, 180.0f, 0.0f));
-				drawModel(model_shader, coconut_tree2, glm::vec3(-17.0f, 0.0f, 14.0f), glm::vec3(0.5f));
-				drawModel(model_shader, coconut_tree2, glm::vec3(-17.0f, 0.0f, -14.0f), glm::vec3(0.5f));
+                drawModel(model_shader, coconut_tree1, glm::vec3(10.0f, 0.0f, 11.0f), glm::vec3(0.05f));
+                drawModel(model_shader, coconut_tree1, glm::vec3(15.0f, 0.0f, -15.0f), glm::vec3(0.05f),
+                          glm::vec3(0.0f, 180.0f, 0.0f));
+                drawModel(model_shader, coconut_tree2, glm::vec3(-17.0f, 0.0f, 14.0f), glm::vec3(0.5f));
+                drawModel(model_shader, coconut_tree2, glm::vec3(-17.0f, 0.0f, -14.0f), glm::vec3(0.5f));
 
                 drawModel(model_shader, volcano, glm::vec3(-30.0f, -1.0f, -30.0f), glm::vec3(1.0f));
 
                 model_shader.SetInteger("gammaMode", NoGamma);
-                drawModel(model_shader, timeAndRelativeDimensionInSpace, glm::vec3(-15, 0, 0), glm::vec3(0.03), glm::vec3(0.0f, 0.5f * M_PI, 0.0f));
+                drawModel(model_shader, timeAndRelativeDimensionInSpace, beach_tardis_pos, glm::vec3(0.023),
+                          glm::vec3(0.0f, 0.5f * M_PI, 0.0f));
                 model_shader.SetInteger("gammaMode", GAMMA_MODE);
 
             } else {
@@ -620,7 +638,8 @@ int main() {
                 }
 
                 model_shader.SetInteger("gammaMode", NoGamma);
-                drawModel(model_shader, timeAndRelativeDimensionInSpace, glm::vec3(70, 10, 66), glm::vec3(0.03), glm::vec3(0.0f, -0.5 * M_PI, 0.0f));
+                drawModel(model_shader, timeAndRelativeDimensionInSpace, mountain_tardis_pos, glm::vec3(0.023),
+                          glm::vec3(0.0f, -0.5 * M_PI, 0.0f));
                 model_shader.SetInteger("gammaMode", GAMMA_MODE);
             }
 
@@ -822,17 +841,6 @@ void checkCollision() {
             have_penguin += 1;
             current_hot_index += 1;
         }
-        if (current_hot_index == 4) {
-            // Set jump into snow mountains
-            camera.Position = glm::vec3(52.0f, 18.0f, 66.0f);
-            stage_mode = true;
-            scene_mode = 1;
-            current_hot_index = 0;
-            have_penguin = 0;
-            have_snowman = 0;
-            cubemapTexture = CubeRender::loadCubemap(faces);
-			cubemapTexture2 = CubeRender::loadCubemap(night_faces);
-        }
     }
     // Check mountain objects collision
     if ((player_pos.x >= fire_elements_pos[current_cold_index].x - border_box &&
@@ -849,8 +857,41 @@ void checkCollision() {
             have_cactus += 1;
             current_cold_index += 1;
         }
-        if (current_cold_index == 4) {
+
+    }
+
+    if ((player_pos.x >= beach_tardis_pos.x - border_box * 2.5 &&
+         player_pos.x <= beach_tardis_pos.x + border_box * 2.5) &&
+        (player_pos.z >= beach_tardis_pos.z - border_box * 2.5 &&
+         player_pos.z <= beach_tardis_pos.z + border_box * 2.5) &&
+        (player_pos.y >= beach_tardis_pos.y - border_box &&
+         player_pos.y <= beach_tardis_pos.y + border_box * 6) && scene_mode == 0) {
+
+        if (current_hot_index == 4) {
             // Set jump into snow mountains
+            camera.Position = glm::vec3(52.0f, 18.0f, 66.0f);
+            stage_mode = true;
+            scene_mode = 1;
+            current_hot_index = 0;
+            have_penguin = 0;
+            have_snowman = 0;
+            cubemapTexture = CubeRender::loadCubemap(faces);
+            cubemapTexture2 = CubeRender::loadCubemap(night_faces);
+        } else {
+            camera.Position -= camera.Front;
+        }
+
+    }
+
+    if ((player_pos.x >= mountain_tardis_pos.x - border_box * 2.5 &&
+         player_pos.x <= mountain_tardis_pos.x + border_box * 2.5) &&
+        (player_pos.z >= mountain_tardis_pos.z - border_box * 2.5 &&
+         player_pos.z <= mountain_tardis_pos.z + border_box * 2.5) &&
+        (player_pos.y >= mountain_tardis_pos.y - border_box &&
+         player_pos.y <= mountain_tardis_pos.y + border_box * 6) && scene_mode == 1) {
+
+        if (current_cold_index == 4) {
+            // Set jump into beach
             camera.Position = glm::vec3(0.0f, 2.0f, 0.0f);
             stage_mode = false;
             scene_mode = 0;
@@ -858,6 +899,8 @@ void checkCollision() {
             have_fire = 0;
             have_cactus = 0;
             cubemapTexture = CubeRender::loadCubemap(hot_faces);
+        } else {
+            camera.Position -= camera.Front;
         }
     }
 }
