@@ -100,5 +100,5 @@ void main()
             FragColor = vec4(result, 1.0) * vec4(objectColor, 1.0);
         }
     }
-    
+
 }
