@@ -66,7 +66,7 @@ int have_fire = 0, have_cactus = 0;
 float current_z = 0.0f;
 
 enum GammaMode {
-    ShaderGamma = 0, OpenGLGamma = 1, NoGamma = 2
+    ShaderGamma = 0, OpenGLGamma = 1, NoGamma = 2, GammaTexture = 3
 } GAMMA_MODE = ShaderGamma;
 
 bool stage_mode = false, view_mode = false;
@@ -601,10 +601,10 @@ int main() {
 
                 drawModel(model_shader, volcano, glm::vec3(-30.0f, -1.0f, -30.0f), glm::vec3(1.0f));
 
-                model_shader.SetInteger("gammaMode", NoGamma);
+//                model_shader.SetInteger("gammaMode", GammaTexture);
                 drawModel(model_shader, timeAndRelativeDimensionInSpace, beach_tardis_pos, glm::vec3(0.023),
                           glm::vec3(0.0f, 0.5f * M_PI, 0.0f));
-                model_shader.SetInteger("gammaMode", GAMMA_MODE);
+//                model_shader.SetInteger("gammaMode", GAMMA_MODE);
 
             } else {
                 drawModel(model_shader, sun, glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.005f));
@@ -621,10 +621,10 @@ int main() {
                                         fire_elements_pos[have_cactus + 2].z), glm::vec3(2.0f));
                 }
 
-                model_shader.SetInteger("gammaMode", NoGamma);
+//                model_shader.SetInteger("gammaMode", GammaTexture);
                 drawModel(model_shader, timeAndRelativeDimensionInSpace, mountain_tardis_pos, glm::vec3(0.023),
                           glm::vec3(0.0f, -0.5 * M_PI, 0.0f));
-                model_shader.SetInteger("gammaMode", GAMMA_MODE);
+//                model_shader.SetInteger("gammaMode", GAMMA_MODE);
             }
 
             if (scene_mode == 1) {
@@ -758,6 +758,7 @@ void processInput(GLFWwindow *window) {
             case NoGamma:
                 GAMMA_MODE = ShaderGamma;
                 break;
+            case GammaTexture:break;
         }
         gammaPressed = false;
     }

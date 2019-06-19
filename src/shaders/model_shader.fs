@@ -79,7 +79,7 @@ void main()
             discard;
         float gamma = 2.2;
         vec3 objectColor;
-        if (gammaMode == 0)
+        if (gammaMode == 0 || gammaMode == 1)
             objectColor = pow(texture(diffuseTexture, fs_in.TexCoords).rgb, vec3(gamma));
         else
             objectColor = texture(diffuseTexture, fs_in.TexCoords).rgb;
@@ -95,9 +95,9 @@ void main()
         }
         else {
             vec3 objectColor = texture(texture_diffuse0, fs_in.TexCoords).rgb;
-            if (gammaMode == 0)
-                 objectColor = pow(objectColor, vec3(gamma));
             FragColor = vec4(result, 1.0) * vec4(objectColor, 1.0);
+            if (gammaMode == 0 || gammaMode == 3)
+                FragColor.rgb = pow(FragColor.rgb, vec3(1.0 / gamma));
         }
     }
 
