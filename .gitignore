@@ -14,3 +14,8 @@
 !ppt
 !CMakeLists.txt
 .DS_Store
+!/bin/**
+!/doc/**
+!/bin
+!/doc
+
